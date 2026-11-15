@@ -6,7 +6,7 @@ Nibmark turns a small text definition into a familiar, black-and-white **Softwar
 
 [Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.1.** Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.2.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
 
@@ -115,7 +115,7 @@ the core has no React dependency.
 ```sh
 npm run build
 npm test
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:e2e
 ```
 
@@ -132,12 +132,19 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 - 50 KB input, 200 characters per quoted string, 100 ingredient rows.
 - Very tall labels can use SVG; PNG is capped at 16,000 pixels high and 16 megapixels.
 - Display language is an editor setting. Source is kept in memory until you explicitly save it.
-- Desktop Chrome is covered by local end-to-end tests. Other browser compatibility needs additional validation.
+- Automated browser coverage uses Chromium, Firefox and WebKit. Real Safari/iOS devices still need manual verification.
 
 ## Roadmap
 
-The next release work is design refinement and broader browser checks. SBOM imports,
-project analysis, a CLI and Markdown integrations remain future extensions.
+Work proceeds in this order, one round and branch per milestone:
+
+1. Label design review and browser compatibility — completed in 0.2.0.
+2. Import existing SBOM files into the label model — next.
+3. Analyze projects, starting with npm package-lock.json.
+4. CLI generation for README automation.
+5. Markdown renderer integrations.
+
+See [versioning](VERSIONING.md) and [changes](CHANGELOG.md) for release tracking.
 
 The [original design](design/software-facts-v0.1.md) records the product decisions;
 the [syntax guide](docs/syntax.md) describes the implemented behavior.

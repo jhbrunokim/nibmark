@@ -5,6 +5,7 @@ import { loadFonts } from '../renderer/fonts';
 import { render, type RenderedLabel } from '../renderer/render';
 import { download, filename, markdown, png } from './exports';
 import { readShare, shareURL, ShareError } from './share';
+import { version } from '../../package.json';
 
 const copy = {
   en: {
@@ -357,7 +358,7 @@ export function App() {
             <span className="workspace-title">
               {locale === 'ko' ? '라벨 작업실' : 'Label playground'}
             </span>
-            <span className="version">v0.1</span>
+            <span className="version">v{version}</span>
           </div>
           <div className="toolbar-right">
             <label className="select-label">
