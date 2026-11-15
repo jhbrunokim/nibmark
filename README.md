@@ -2,23 +2,35 @@
 
 **Give your project a nutrition label.**
 
-Nibmark is a project in design that will turn a small text definition into a familiar, black-and-white **Software Facts** label for your README.
+Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Describe the ingredients; Nibmark handles the typography, layout, and percentages.
 
-**Status: design stage.** The label below is a static design sample. The parser, renderer, and live editor have not been implemented. There is no published package or hosted editor yet.
+[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [Contributing](CONTRIBUTING.md)
 
-[Design specification](design/software-facts-v0.1.md) · [Example syntax](#example-syntax) · [Roadmap](#roadmap)
+**v0.1.** Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
-## A familiar label for your project's ingredients
+<img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
 
-Dependencies become the headline number. Direct and transitive dependencies become the main ingredients. Included items sit beneath their parents, and license declarations appear below a thick divider.
+## Get started
 
-The aim is simple: make something fun that developers want to put in their README.
+Use Node.js 24.16+ and npm:
 
-<img src="design/software-facts-label.svg" alt="Static Software Facts design: tiny-app has 128 runtime dependencies, including 12 direct and 116 transitive dependencies. All figures are fictional." width="360">
+```sh
+git clone https://github.com/jhbrunokim/nibmark.git
+cd nibmark
+npm ci
+npm run dev
+```
 
-## Example syntax
+Open the Local URL printed by Vite. You will see an editable example and its rendered label.
 
-This is the proposed v1 syntax for the design sample above. All values are fictional and entered by the author.
+1. Change the project name and ingredient counts.
+2. Download SVG or PNG.
+3. Add the image to your repository.
+4. Copy the Markdown snippet into your README.
+
+The project being described can use any language or framework. Only people developing or self-hosting Nibmark need Node.js; users of a hosted editor will only need a browser.
+
+## Example
 
 ```nibmark
 nutrition v1
@@ -40,70 +52,91 @@ group "License declarations" of dependencies
 note "Made with care. And probably too much coffee."
 ```
 
-The code block identifier is `nibmark`. Inside it, `nutrition` selects the label type and `v1` selects the syntax version. The project version is a separate value.
+The block name is `nibmark`. `nutrition` selects the label type and `v1` the syntax version.
+Counts are entered by the author. Each group must add up to the dependency total.
+An `includes` item is already counted in its parent. `% of Total` describes composition,
+not a recommended dependency allowance.
 
-Nibmark will calculate each percentage from the total dependency count. An `includes` item is already part of its parent; it is not added to the total again. `% of Total` describes composition, not a recommended dependency allowance.
+## The playground
 
-## Planned first version
+![Nibmark live editor with text source and a Software Facts preview](docs/assets/playground.png)
 
-- A browser editor with text on one side and a live label preview on the other.
-- A fixed nutrition-label layout with bold typography, clear hierarchy, and black rules.
-- SVG and PNG downloads, plus a Markdown image snippet for your README.
-- Save and reopen the text definition.
-- English and Korean interface and label support.
-- Local browser processing for label content.
-- The same syntax for projects written in any language or framework.
+- Live text editing with line numbers and precise syntax errors.
+- A fixed nutrition-label layout: bold headline, thick rules, nested ingredients.
+- English and Korean interface and label wording.
+- SVG and 2× PNG downloads, plus a Markdown image snippet.
+- Save/open `.nibmark` definitions and undo an example/file replacement.
+- Processing in browser memory; label contents are not sent to a server.
+- Outlined SVG text preserves the appearance without installed fonts.
 
-The first version will render the information you enter. Automatic repository analysis, SBOM imports, and vulnerability lookups are future work.
+The examples are fictional. The first version does not analyze repositories or import SBOMs.
 
-## Planned workflow
+## Put it in your README
 
-1. Open the editor with a ready-made example.
-2. Change the project name, counts, and ingredient labels.
-3. Preview the result and download an image.
-4. Commit the image to your repository and insert it into your README.
-
-Once an image is saved at `docs/software-facts.svg`, a README can embed it with:
+After adding the downloaded image to your repository:
 
 ```markdown
-![Software Facts](docs/software-facts.svg)
+![Software Facts for tiny-app](./tiny-app-facts.svg)
 ```
 
-GitHub does not currently provide native Nibmark rendering. A `nibmark` code block will display as source text unless the host has a Nibmark integration. The first version's README output will be an ordinary SVG or PNG image.
+GitHub does not render `nibmark` code blocks natively. Use the exported SVG or PNG.
+If you put the image in another directory, update the Markdown path.
 
-## Design principles
+## Architecture
 
-- Keep the recognizable nutrition-label silhouette and visual hierarchy.
-- Describe content and relationships in text; let the renderer handle layout.
-- Keep the core renderer independent of the editor framework and the project being described.
-- Make definitions readable in version control.
-- Show errors at the relevant line and preserve the last valid preview.
+```text
+Text → parser → label model → validation → layout → SVG
+                                                    └→ PNG
+```
 
-The design translates the information hierarchy of the updated US nutrition label into software terms: a clear serving basis, a prominent headline amount, nested ingredients, quantities alongside percentages, and a short explanation of the denominator.
+- `src/core/`: framework-independent parser, model and count validation.
+- `src/renderer/`: font measurement, nutrition layout and self-contained SVG.
+- `src/editor/`: React playground, file operations and browser image exports.
+- `tests/`: parser, rendering, export and end-to-end tests.
+
+One renderer serves both preview and download. The web editor is React + Vite;
+the core has no React dependency.
+
+## Development and checks
+
+```sh
+npm run build
+npm test
+npx playwright install chromium
+npm run test:e2e
+```
+
+On a machine with Chrome installed, use `PLAYWRIGHT_CHANNEL=chrome npm run test:e2e`.
+Browser tests cover editing, error recovery, exports, clipboard, source round trips,
+Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md).
+
+`npm run preview` serves the production build locally. GitHub Actions tests and deploys `main` to GitHub Pages. The deployment build uses `--base=/nibmark/`; local builds keep relative paths. npm publishing remains a separate step.
+
+## Current limits
+
+- One label type: `nutrition v1`; all composition groups use the dependency count as their denominator.
+- English, Korean and supported Latin characters/symbols. Unsupported characters, including most emoji, are reported as errors.
+- 50 KB input, 200 characters per quoted string, 100 ingredient rows.
+- Very tall labels can use SVG; PNG is capped at 16,000 pixels high and 16 megapixels.
+- Display language is an editor setting. Source is kept in memory until you explicitly save it.
+- Desktop Chrome is covered by local end-to-end tests. Other browser compatibility needs additional validation.
 
 ## Roadmap
 
-| Stage | Scope | Status |
-| --- | --- | --- |
-| Design | Name, purpose, proposed syntax, static label, acceptance criteria | Prepared for review |
-| Renderer | Parser, validation, label model, typography and SVG rendering | Planned |
-| Editor | Live preview, examples, English/Korean support, exports | Planned |
-| First release | Visual checks, export compatibility, usage documentation | Planned |
-| Later | SBOM import, project analysis, CLI and Markdown integrations | Outside the first version |
+The next release work is design refinement and broader browser checks. SBOM imports,
+project analysis, a CLI and Markdown integrations remain future extensions.
 
-## Contributing
-
-At this stage, useful feedback concerns the syntax, visual resemblance to a nutrition label, and how easily someone can make their first label. See the [design specification](design/software-facts-v0.1.md).
-
-Development setup and contribution instructions will be added after the toolchain is implemented and verified. Installation commands and package badges will appear when there is a working release.
+The [original design](design/software-facts-v0.1.md) records the product decisions;
+the [syntax guide](docs/syntax.md) describes the implemented behavior.
 
 ## Inspiration
 
-- [Mermaid](https://github.com/mermaid-js/mermaid) — text definitions, rendered examples, and an approachable live-editor workflow.
-- [FDA nutrition-label changes](https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/changes-nutrition-facts-label) — visual hierarchy and presentation of quantities and included ingredients.
+- [Mermaid](https://github.com/mermaid-js/mermaid): text definitions and an approachable live-editor workflow.
+- [FDA nutrition-label changes](https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/changes-nutrition-facts-label): visual hierarchy, quantities and included ingredients.
 
-Nibmark is an independent project. Its text and label design are being developed specifically for this use case.
+Nibmark is an independent project and does not use Mermaid as a runtime dependency.
 
 ## License
 
-[MIT](LICENSE) © 2026 jhbrunokim.
+[MIT](LICENSE) © 2026 jhbrunokim. Fonts retain their SIL Open Font License;
+see [third-party notices](THIRD_PARTY_NOTICES.md).
