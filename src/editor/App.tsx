@@ -4,6 +4,7 @@ import { examples, type ExampleName } from '../examples';
 import { loadFonts } from '../renderer/fonts';
 import { render, type RenderedLabel } from '../renderer/render';
 import { download, filename, markdown, png } from './exports';
+import { readShare, shareURL, ShareError } from './share';
 
 const copy = {
   en: {
@@ -29,6 +30,14 @@ const copy = {
     svg: 'Download SVG',
     png: 'Download PNG',
     md: 'Copy Markdown',
+    share: 'Copy edit link',
+    shareHint: 'Anyone with the link can open and edit a copy.',
+    linkCopied: 'Edit link copied.',
+    linkHelp: 'Copy this edit link manually',
+    linkInvalid:
+      'This edit link is incomplete or unsupported. Ask for a new link or open a .nibmark file.',
+    linkLong:
+      'This recipe is too long for a share link. Save the source and share the .nibmark file instead.',
     privacy: 'Made in your browser. Your recipe stays here.',
     footer: 'A familiar label. A different kind of ingredient.',
     illustrative: 'Sample values. Make them your own.',
@@ -71,6 +80,14 @@ const copy = {
     svg: 'SVG 다운로드',
     png: 'PNG 다운로드',
     md: 'Markdown 복사',
+    share: '편집 링크 복사',
+    shareHint: '링크를 받은 사람은 내용을 열고 사본을 수정할 수 있습니다.',
+    linkCopied: '편집 링크를 복사했습니다.',
+    linkHelp: '아래 편집 링크를 직접 복사하세요',
+    linkInvalid:
+      '편집 링크가 불완전하거나 지원하지 않는 형식입니다. 새 링크를 받거나 .nibmark 파일을 여세요.',
+    linkLong:
+      '문법이 길어 공유 링크를 만들 수 없습니다. 문법을 저장한 뒤 .nibmark 파일로 공유하세요.',
     privacy: '브라우저 안에서 만듭니다. 입력 내용은 전송하지 않습니다.',
     footer: '익숙한 성분표에 담은 소프트웨어.',
     illustrative: '가상의 예제 수치입니다. 내 프로젝트에 맞게 바꿔보세요.',
@@ -130,8 +147,22 @@ function Icon({ name }: { name: 'open' | 'save' | 'download' | 'copy' | 'arrow' 
   );
 }
 export function App() {
-  const [source, setSource] = useState<string>(examples.classic);
-  const [locale, setLocale] = useState<Locale>('en');
+  const [initial] = useState(() => {
+    try {
+      return {
+        ...(readShare(window.location.hash) ?? {
+          source: examples.classic,
+          locale: 'en' as Locale,
+        }),
+        invalid: false,
+      };
+    } catch {
+      return { source: examples.classic, locale: 'en' as Locale, invalid: true };
+    }
+  });
+  const [source, setSource] = useState<string>(initial.source);
+  const [locale, setLocale] = useState<Locale>(initial.locale);
+  const [linkInvalid, setLinkInvalid] = useState(initial.invalid);
   const [last, setLast] = useState<{
     label: RenderedLabel;
     model: LabelModel;
@@ -142,6 +173,7 @@ export function App() {
   const [actionError, setActionError] = useState('');
   const [message, setMessage] = useState('');
   const [fallback, setFallback] = useState('');
+  const [fallbackLabel, setFallbackLabel] = useState('');
   const [busy, setBusy] = useState(false);
   const [retry, setRetry] = useState(0);
   const [previous, setPrevious] = useState<{ source: string; locale: Locale }>();
@@ -187,7 +219,24 @@ export function App() {
     const id = setTimeout(() => setMessage(''), 5000);
     return () => clearTimeout(id);
   }, [message]);
+  useEffect(() => {
+    function openLink() {
+      try {
+        const recipe = readShare(window.location.hash);
+        setLinkInvalid(false);
+        if (!recipe) return;
+        setPrevious({ source, locale });
+        setSource(recipe.source);
+        setLocale(recipe.locale);
+      } catch {
+        setLinkInvalid(true);
+      }
+    }
+    window.addEventListener('hashchange', openLink);
+    return () => window.removeEventListener('hashchange', openLink);
+  }, [source, locale]);
   function replace(next: string, language = locale) {
+    setLinkInvalid(false);
     setPrevious({ source, locale });
     setSource(next);
     setLocale(language);
@@ -236,7 +285,30 @@ export function App() {
       setMessage(c.copied);
       setFallback('');
     } catch {
+      setFallbackLabel(c.copyHelp);
       setFallback(snippet);
+    }
+  }
+  async function copyEditLink() {
+    if (!ready) return;
+    setActionError('');
+    setMessage('');
+    setFallback('');
+    let url: string;
+    try {
+      url = shareURL({ source, locale }, window.location.href);
+    } catch (e) {
+      setActionError(
+        e instanceof ShareError && e.code === 'too-long' ? c.linkLong : c.browserError,
+      );
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setMessage(c.linkCopied);
+    } catch {
+      setFallbackLabel(c.linkHelp);
+      setFallback(url);
     }
   }
   function save() {
@@ -407,6 +479,11 @@ export function App() {
                 </button>
               </p>
             </div>
+            {linkInvalid && (
+              <div className="diagnostics" role="alert">
+                <p>{c.linkInvalid}</p>
+              </div>
+            )}
             {!parsed.ok && (
               <div className="diagnostics" role="alert">
                 {parsed.errors.map((error, i) => (
@@ -476,10 +553,17 @@ export function App() {
                   {c.md}
                 </button>
               </div>
+              <div className="share-row">
+                <button disabled={!ready || busy} onClick={() => void copyEditLink()}>
+                  <Icon name="copy" />
+                  {c.share}
+                </button>
+                <p>{c.shareHint}</p>
+              </div>
               {!ready && <p className="export-reason">{c.fix}</p>}
               {fallback && (
                 <label className="copy-fallback">
-                  {c.copyHelp}
+                  {fallbackLabel}
                   <textarea readOnly value={fallback} onFocus={(e) => e.target.select()} />
                 </label>
               )}

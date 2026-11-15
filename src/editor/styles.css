@@ -450,7 +450,8 @@ p {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.markdown-row button {
+.markdown-row button,
+.share-row button {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -460,7 +461,8 @@ p {
   font-size: 11px;
   padding: 7px 0;
 }
-.markdown-row button:hover:not(:disabled) {
+.markdown-row button:hover:not(:disabled),
+.share-row button:hover:not(:disabled) {
   color: var(--green);
 }
 .action-message {
@@ -704,4 +706,19 @@ footer {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+.share-row {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.share-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.share-row p {
+  margin-top: 8px;
+  font-size: 12px;
 }
