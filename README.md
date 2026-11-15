@@ -66,6 +66,7 @@ not a recommended dependency allowance.
 - English and Korean interface and label wording.
 - SVG and 2× PNG downloads, plus a Markdown image snippet.
 - Save/open `.nibmark` definitions and undo an example/file replacement.
+- Copy an edit link that restores the recipe and English/Korean display language.
 - Processing in browser memory; label contents are not sent to a server.
 - Outlined SVG text preserves the appearance without installed fonts.
 
@@ -81,6 +82,18 @@ After adding the downloaded image to your repository:
 
 GitHub does not render `nibmark` code blocks natively. Use the exported SVG or PNG.
 If you put the image in another directory, update the Markdown path.
+
+## Share an editable label
+
+Choose **Copy edit link** to share the current recipe and display language. The recipient
+can edit their own copy; later edits do not change an earlier link. This is a link to the
+editor, not a hosted image URL for Markdown.
+
+The recipe is encoded in the URL fragment (after `#`). It is not sent to the hosting
+server by the browser, and Nibmark does not upload it. Anyone holding the full link can
+read its contents. Links are limited to 12,000 characters; use **Save source** for larger
+recipes or if a messaging service truncates a link. Invalid links show a recovery message.
+Opening another edit link in the same tab allows **Undo replacement**.
 
 ## Architecture
 
