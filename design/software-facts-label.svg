@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="620" viewBox="0 0 360 620" role="img" aria-labelledby="title desc">
+  <title id="title">Software Facts label — design proposal</title>
+  <desc id="desc">Fictional tiny-app release 1.0.0. 128 runtime dependencies: 12 direct and 116 transitive, including 16 optional. License declarations: MIT 96, Apache-2.0 24, unspecified 8. Percentages use 128 as the denominator.</desc>
+  <rect width="360" height="620" fill="white"/>
+  <rect x="2" y="2" width="356" height="616" fill="none" stroke="black" stroke-width="3"/>
+  <g fill="black" font-family="Arial, Helvetica, sans-serif">
+    <text x="11" y="47" font-size="43" font-weight="900" textLength="338" lengthAdjust="spacingAndGlyphs">Software Facts</text>
+    <path d="M11 55H349" stroke="black" stroke-width="1"/>
+    <text x="11" y="76" font-size="17">tiny-app · v1.0.0</text>
+    <text x="11" y="101" font-size="21" font-weight="700">Serving size</text>
+    <text x="349" y="101" font-size="21" font-weight="700" text-anchor="end">1 release</text>
+    <rect x="11" y="109" width="338" height="13"/>
+    <text x="11" y="142" font-size="14" font-weight="700">Amount per release · Runtime dependencies</text>
+    <text x="11" y="179" font-size="29" font-weight="900" textLength="218" lengthAdjust="spacingAndGlyphs">Dependencies</text>
+    <text x="350" y="181" font-size="46" font-weight="900" text-anchor="end">128</text>
+    <rect x="11" y="191" width="338" height="6"/>
+    <text x="349" y="217" text-anchor="end" font-size="14" font-weight="700">% of Total*</text>
+    <path d="M11 225H349" stroke="black" stroke-width="1"/>
+    <text x="11" y="247" font-size="16"><tspan font-weight="700">Direct</tspan><tspan> 12 packages</tspan></text>
+    <text x="349" y="247" font-size="16" text-anchor="end" font-weight="700">9%</text>
+    <path d="M11 255H349" stroke="black" stroke-width="0.8"/>
+    <text x="11" y="277" font-size="16"><tspan font-weight="700">Transitive</tspan><tspan> 116 packages</tspan></text>
+    <text x="349" y="277" font-size="16" text-anchor="end" font-weight="700">91%</text>
+    <path d="M27 285H349" stroke="black" stroke-width="0.8"/>
+    <text x="27" y="307" font-size="16">Includes 16 optional packages</text>
+    <text x="349" y="307" font-size="16" text-anchor="end" font-weight="700">13%</text>
+    <rect x="11" y="319" width="338" height="12"/>
+    <text x="11" y="353" font-size="16" font-weight="700">License declarations</text>
+    <path d="M11 361H349" stroke="black" stroke-width="0.8"/>
+    <text x="11" y="384" font-size="16">MIT 96 packages</text>
+    <text x="349" y="384" font-size="16" text-anchor="end">75%</text>
+    <path d="M11 392H349" stroke="black" stroke-width="0.8"/>
+    <text x="11" y="415" font-size="16">Apache-2.0 24 packages</text>
+    <text x="349" y="415" font-size="16" text-anchor="end">19%</text>
+    <path d="M11 423H349" stroke="black" stroke-width="0.8"/>
+    <text x="11" y="446" font-size="16">Unspecified 8 packages</text>
+    <text x="349" y="446" font-size="16" text-anchor="end">6%</text>
+    <rect x="11" y="456" width="338" height="6"/>
+    <text x="11" y="482" font-size="12">
+      <tspan x="11" dy="0">* % of Total is based on 128 runtime dependencies.</tspan>
+      <tspan x="19" dy="16">Included items are already counted in their parent.</tspan>
+      <tspan x="19" dy="16">Percentages are rounded.</tspan>
+    </text>
+    <text x="11" y="548" font-size="12">
+      <tspan x="11" dy="0">Made with care.</tspan>
+      <tspan x="11" dy="16">And probably too much coffee.</tspan>
+    </text>
+    <text x="11" y="602" font-size="10">DESIGN SAMPLE · FICTIONAL DATA</text>
+  </g>
+</svg>
