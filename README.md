@@ -4,9 +4,9 @@
 
 Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Describe the ingredients; Nibmark handles the typography, layout, and percentages.
 
-[Get started](#get-started) · [Syntax guide](docs/syntax.md) · [Contributing](CONTRIBUTING.md)
+[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.1 — local preview.** The editor and renderer are implemented. There is no hosted editor or published npm package yet.
+**v0.1.** Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
 
@@ -110,7 +110,7 @@ On a machine with Chrome installed, use `PLAYWRIGHT_CHANNEL=chrome npm run test:
 Browser tests cover editing, error recovery, exports, clipboard, source round trips,
 Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md).
 
-`npm run preview` serves the production build locally. Hosted deployment and npm publishing are separate steps.
+`npm run preview` serves the production build locally. GitHub Actions tests and deploys `main` to GitHub Pages. The deployment build uses `--base=/nibmark/`; local builds keep relative paths. npm publishing remains a separate step.
 
 ## Current limits
 
