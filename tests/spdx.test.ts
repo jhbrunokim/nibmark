@@ -292,7 +292,7 @@ describe('SPDX inventory conversion', () => {
     });
     const result = toNibmark(doc, 'SPDXRef-App', 'en');
     expect(result.unknownPurpose).toBe(3);
-    expect(result.source).toContain('item "Unspecified purpose" 3');
+    expect(result.compositionBasis).toBe('ecosystem');
     expect(result.source).not.toContain('item "Frameworks"');
   });
   it('deduplicates typed edges, permits overlap and never inherits runtime scope', () => {
@@ -375,6 +375,66 @@ describe('SPDX inventory conversion', () => {
     expect(
       toNibmark({ ...doc, packages: [...doc.packages].reverse() }, 'SPDXRef-App', 'en').source,
     ).toBe(result.source);
+  });
+
+  it('accepts a unique nonstandard document ID with a warning, preserving relationship roots', () => {
+    const doc = document((r) => {
+      r.SPDXID = 'SPDXRef-CustomDocument';
+      r.relationships[0].spdxElementId = r.SPDXID;
+    });
+    expect(doc.warnings).toEqual(['nonstandard-document-id']);
+    expect(doc.roots).toEqual(['SPDXRef-App']);
+    expect(toNibmark(doc, doc.roots[0], 'en').count).toBe(3);
+  });
+  it('uses an explicit placeholder for absent/blank document names, not a guessed package root', () => {
+    for (const name of [undefined, '', '   ']) {
+      const doc = document((r) => {
+        r.name = name;
+      });
+      expect(doc.warnings).toContain('missing-document-name');
+      expect(toNibmark(doc, undefined, 'en').source).toContain('project "Untitled SBOM"');
+      expect(toNibmark(doc, 'SPDXRef-App', 'en').source).toContain('project "tiny-app"');
+    }
+    expect(() =>
+      document((r) => {
+        r.name = 123;
+      }),
+    ).toThrow('invalid');
+  });
+  it('does not replace partially recorded purposes or guess a purpose when PURLs are absent', () => {
+    const partial = document((r) => {
+      r.packages[1].primaryPackagePurpose = 'LIBRARY';
+    });
+    expect(toNibmark(partial, 'SPDXRef-App', 'en')).toMatchObject({
+      compositionBasis: 'purpose',
+      unknownPurpose: 2,
+    });
+    const absent = document((r) => {
+      for (const p of r.packages) delete p.externalRefs;
+    });
+    expect(toNibmark(absent, 'SPDXRef-App', 'en').source).toContain('item "Unspecified purpose" 3');
+  });
+  it('bounds an ecosystem fallback without losing package totals or duplicating the group', () => {
+    const doc = document((r) => {
+      r.packages = Array.from({ length: 100 }, (_, i) => ({
+        SPDXID: 'SPDXRef-' + i,
+        name: 'lib-' + i,
+        externalRefs: [{ referenceType: 'purl', referenceLocator: 'pkg:eco' + i + '/pkg' }],
+      }));
+      r.relationships = [];
+    });
+    const result = toNibmark(doc, undefined, 'en');
+    expect(result).toMatchObject({
+      compositionBasis: 'ecosystem',
+      count: 100,
+      grouped: 80,
+      representativeCount: 12,
+    });
+    const parsed = parse(result.source);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.model.groups.filter((g) => g.label === 'Package ecosystems')).toHaveLength(1);
+    for (const g of parsed.model.groups) expect(g.items.reduce((n, i) => n + i.count, 0)).toBe(100);
   });
   it('bounds file and collection sizes', () => {
     expect(() => readSpdx(' '.repeat(MAX_SPDX_BYTES + 1))).toThrow('size');

@@ -6,7 +6,7 @@ Nibmark turns a small text definition into a familiar, black-and-white **Softwar
 
 [Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.4.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.5.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/pantry-api.svg" alt="Software Facts for Pantry API: 24 packages, with Fastify nested under Frameworks and PostgreSQL/Redis clients under Libraries. Fictional SPDX data." width="360">
 
@@ -79,7 +79,7 @@ group "Declared licenses" of packages
 group "Package ecosystems" of packages
   item "npm" 24
 
-note "Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred."
+note "Purposes follow SBOM records. Selected names only. Edges may be incomplete or overlap; runtime scope is not inferred."
 ```
 
 </details>
@@ -121,7 +121,8 @@ If you put the image in another directory, update the Markdown path.
 Choose **Import SPDX**, open an SPDX 2.2/2.3 JSON or Tag/Value file, review the project
 root and counts, and select **Create label**. Package totals, recorded relationships,
 declared licenses, ecosystems and provenance become editable text. No file is uploaded.
-See the [generator compatibility and counting rules](docs/spdx-import.md).
+See the [generator compatibility and counting rules](docs/spdx-import.md) and the
+[pinned upstream regression corpus](tests/fixtures/spdx/upstream/README.md).
 
 ## Share an editable label
 
@@ -180,20 +181,27 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 SPDX imports show package purposes as parent rows and representative package
 names beneath them, like a nutrition label's nested ingredients. Project
 descriptions appear below the heading; explicit dependency subtypes, licenses
-and ecosystems add context. Missing purpose information stays unspecified.
+and ecosystems add context. Missing purpose information stays unspecified. When no package has a recorded purpose,
+PURL ecosystems provide a clearly identified fallback composition if available.
 
 Try **Import SPDX → Download Pantry API example SPDX** in the playground, then
 import that fictional example. See the [field mapping and selection rules](docs/spdx-import.md#hierarchical-ingredients-040).
 
 ## Roadmap
 
-Work proceeds in this order, one round and branch per milestone:
+Completed foundations: label/browser work (0.2.0), SPDX 2.x import (0.3.0),
+and hierarchical ingredients (0.4.0).
 
-1. Label design review and browser compatibility — completed in 0.2.0.
-2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0; hierarchical ingredients and project descriptions added in 0.4.0.
-3. Broaden SBOM input and presentation: SPDX 3.x JSON-LD, CycloneDX and common metadata.
-4. CLI conversion of existing SBOMs/recipes for README automation.
-5. Markdown renderer integrations.
+Required rounds, one at a time:
+
+1. Real SBOM compatibility and missing-data presentation — completed in 0.5.0.
+2. Select and pin representative ingredients and choose displayed sections.
+3. Compact and detailed compositions within the same nutrition-label design.
+
+Optional backlog (not scheduled as required rounds):
+
+- SPDX 3.x JSON-LD and CycloneDX adapters.
+- CLI conversion, GitHub Actions automation and Markdown renderer integrations.
 
 Product direction: make existing generators' results easy to read and share.
 Building another SBOM generator or repository analyzer is outside the roadmap.

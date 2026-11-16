@@ -10,3 +10,5 @@
 - Use the three-part `main.sub.ninor` rules in VERSIONING.md; keep package, lockfile, UI and changelog consistent.
 
 - Nibmark presents existing SBOM outputs. Do not build a project scanner/SBOM generator. Add common presentation concepts rather than tool-specific grammar.
+
+- Required next rounds are real-SBOM robustness, representative selection, then compact/detailed composition. SPDX 3.x/CycloneDX and CLI/Actions/Markdown integration are optional backlog, not automatic next steps.
