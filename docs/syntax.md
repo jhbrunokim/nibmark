@@ -31,7 +31,7 @@ note "Made with care."
 | `project "name" version "version"` | Yes                    | Name; the `version` clause is optional                         |
 | `serving "1 release"`              | No                     | Basis of the label; defaults to one release                    |
 | `scope "Runtime dependencies"`     | No                     | What the numbers describe; defaults to runtime dependencies    |
-| `dependencies 128`                 | One count declaration                    | Headline count and percentage denominator                      |
+| `dependencies 128`                 | One count declaration  | Headline count and percentage denominator                      |
 | `group "name" of dependencies`     | At least one           | A complete breakdown of the total                              |
 | `  item "name" 12`                 | At least one per group | Two-space indentation, name and count                          |
 | `    includes "name" 3`            | No                     | Four-space indentation; already included in the preceding item |
@@ -40,6 +40,10 @@ note "Made with care."
 Use one `dependencies N` or `packages N` declaration. The latter displays Packages
 and defaults to an SBOM inventory scope. Every group must use the same denominator:
 `of dependencies` or `of packages`. These counts are never combined in one label.
+
+Optional `description "short project description"` appears below the project
+name. `supplier "Organization: Example"` appears in the footer. These are plain
+display text, not a classification or a verified identity.
 
 Optional `source "format"`, `generator "tool"` and `created "timestamp"` declarations
 add provenance below the footnote. They do not verify authenticity or fetch a file.

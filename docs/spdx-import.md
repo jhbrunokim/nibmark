@@ -18,7 +18,8 @@ previous recipe. Files are processed in browser memory without an upload.
   The UI reports unsupported formats instead of silently producing an empty label.
 - This importer validates the fields needed for its summary. It is not a full SPDX validator.
 
-[Download a fictional example](../public/examples/tiny-app.spdx.json).
+[Download the fictional Pantry API example](../public/examples/pantry-api.spdx.json)
+or the [minimal inventory example](../public/examples/tiny-app.spdx.json).
 
 ## What the numbers mean
 
@@ -50,6 +51,59 @@ summary, not a claim that all packages are runtime dependencies.
 The importer follows explicit evidence, not tool-specific name heuristics. SPDX
 relationships need not be complete, so “Unclassified” does not mean “unused”.
 See the [SPDX relationship specification](https://spdx.github.io/spdx-spec/v2.3.1/relationships-between-SPDX-elements/).
+
+## Hierarchical ingredients (0.4.0)
+
+The label now starts with **recorded purpose → representative package names**,
+so developers can recognize the composition rather than only read totals.
+
+| SPDX input                                    | Nibmark presentation                                   |
+| --------------------------------------------- | ------------------------------------------------------ |
+| Selected root `name`, `versionInfo`           | Project heading                                        |
+| Root `summary`, falling back to `description` | `description` below the heading                        |
+| Root `supplier`                               | `supplier` footer; its original assertion is preserved |
+| Package `primaryPackagePurpose`               | Composition parent row                                 |
+| Package `name`, `versionInfo`                 | Nested `includes` representative entries               |
+| Typed dependency relationships                | Nested edge-type counts beneath Direct/Transitive      |
+| `licenseDeclared`, PURL, creation metadata    | License/ecosystem groups and provenance                |
+
+The JSON fields also map from Tag/Value `PackageSummary`, `PackageDescription`,
+`PackageSupplier` and `PrimaryPackagePurpose`. Empty summaries fall back to the
+description. Without a selected root, no package's description or supplier is
+promoted to project metadata.
+
+Purposes follow the SPDX 2.3 enumeration: framework, library, application,
+container, operating system, device, firmware, source, archive, file, install,
+and other. Missing or unfamiliar values are **Unspecified purpose**. A package
+called React is not automatically classified as a framework. Development tools
+are not a separate SPDX purpose: a tool may be an APPLICATION while its
+relationship is DEV_DEPENDENCY_OF. Older 2.2 documents often have no purpose
+field; their names still appear under the unspecified category.
+
+Each package contributes to exactly one purpose parent. Representatives are
+grouped by displayed name and version, prioritize direct dependencies, then use
+lexical ordering. At most three entries per category and twelve overall are
+shown. These are examples within the parent, not an exhaustive child breakdown
+or a claim of importance. Shortened identical display labels are combined;
+their total still counts the original package records. The original SBOM
+retains all omitted detail.
+
+Explicit runtime/development/build/test/optional/provided edges appear beneath
+the Direct or Transitive group they belong to. Duplicate edges count once per
+package and subtype; one package can occur in multiple subtypes. For Direct,
+only typed edges to the selected root count. For Transitive, only typed edges
+from reachable parents count. Generic edges never imply runtime scope, and
+scope is not inherited along a path. Unreachable parents cannot classify a
+package in the selected root's graph.
+
+The parent groups still each add up to the full package count. Nested rows are
+already included in their parent; all percentages use the full inventory.
+The label notes and import review disclose incomplete purposes, representative
+selection and overlapping subtypes. This is selective presentation, not full
+SPDX field coverage or SPDX conformance validation.
+
+See [SPDX package purpose](https://spdx.github.io/spdx-spec/v2.3.1/package-information/#724-primary-package-purpose-field)
+and [relationship definitions](https://spdx.github.io/spdx-spec/v2.3.1/relationships-between-SPDX-elements/).
 
 ## License and ecosystem summaries
 

@@ -6,7 +6,7 @@ Nibmark turns a small text definition into a familiar, black-and-white **Softwar
 
 [Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.3.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.4.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
 
@@ -143,12 +143,22 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 - Display language is an editor setting. Source is kept in memory until you explicitly save it.
 - Automated browser coverage uses Chromium, Firefox and WebKit. Real Safari/iOS devices still need manual verification.
 
+## Read the ingredients
+
+SPDX imports show package purposes as parent rows and representative package
+names beneath them, like a nutrition label's nested ingredients. Project
+descriptions appear below the heading; explicit dependency subtypes, licenses
+and ecosystems add context. Missing purpose information stays unspecified.
+
+Try **Import SPDX → Download Pantry API example SPDX** in the playground, then
+import that fictional example. See the [field mapping and selection rules](docs/spdx-import.md#hierarchical-ingredients-040).
+
 ## Roadmap
 
 Work proceeds in this order, one round and branch per milestone:
 
 1. Label design review and browser compatibility — completed in 0.2.0.
-2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0.
+2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0; hierarchical ingredients and project descriptions added in 0.4.0.
 3. Broaden SBOM input and presentation: SPDX 3.x JSON-LD, CycloneDX and common metadata.
 4. CLI conversion of existing SBOMs/recipes for README automation.
 5. Markdown renderer integrations.

@@ -65,6 +65,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     model.project + (model.projectVersion ? ` · v${model.projectVersion.replace(/^v/, '')}` : ''),
     17,
   );
+  if (model.description) wrapped(model.description, 12, 'regular', left, width, 15);
   const serving = model.serving ?? (ko ? '릴리스 1개' : '1 release');
   const servingLabel = ko ? '기준 단위' : 'Serving size';
   const servingSpace = width - t.width(servingLabel, 19, 'bold') - 14;
@@ -110,7 +111,9 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     for (const item of group.items) {
       y += 21;
       const itemWeight = groupIndex === 0 ? 'bold' : 'regular';
-      const amount = ko ? ` ${item.count}개` : ` ${item.count} packages`;
+      const amount = ko
+        ? ` ${item.count}개`
+        : ` ${item.count} ${item.count === 1 ? 'package' : 'packages'}`;
       const available = width - 63;
       const totalWidth = t.width(item.label, 16, itemWeight) + t.width(amount, 16);
       const firstY = y;
@@ -131,7 +134,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
         const childY = y;
         const text = ko
           ? `${child.label} ${child.count}개 포함`
-          : `Includes ${child.count} ${child.label} packages`;
+          : `Includes ${child.label} · ${child.count}`;
         wrapped(text, 15, 'regular', left + 17, available - 17, 19);
         const p = percent(child.count, model.dependencies);
         draw(p, right - t.width(p, 15, 'bold'), childY, 15, 'bold');
@@ -152,6 +155,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     wrapped(model.note, 12, 'regular', left, width, 15);
   }
   const provenance = [
+    model.supplier && `${ko ? '공급자' : 'Supplier'}: ${model.supplier}`,
     model.source && `${ko ? '출처' : 'Source'}: ${model.source}`,
     model.generator && `${ko ? '생성 도구' : 'Generator'}: ${model.generator}`,
     model.created && `${ko ? '생성 시점' : 'Created'}: ${model.created}`,
@@ -164,6 +168,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
   const title = `${ko ? '소프트웨어 성분표' : 'Software Facts'} — ${model.project}`;
   const description = [
     title,
+    model.description ?? '',
     `${serving}. ${model.scope ?? defaultScope}.`,
     `${headline}: ${value}.`,
     ...model.groups.flatMap((g) => [

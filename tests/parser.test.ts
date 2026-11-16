@@ -104,3 +104,18 @@ it('accepts inventory and provenance keywords without changing dependency recipe
       .ok,
   ).toBe(false);
 });
+
+it('accepts description and supplier only once before the count', () => {
+  const source = examples.zero.replace(
+    'dependencies 0',
+    'description "A small app"\nsupplier "Organization: Example"\ndependencies 0',
+  );
+  expect(parse(source)).toMatchObject({
+    ok: true,
+    model: { description: 'A small app', supplier: 'Organization: Example' },
+  });
+  expect(parse(source.replace('dependencies 0', 'description "Again"\ndependencies 0')).ok).toBe(
+    false,
+  );
+  expect(parse(examples.zero + '\ndescription "Too late"').ok).toBe(false);
+});

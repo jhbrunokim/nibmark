@@ -15,6 +15,10 @@ export interface SpdxPackage {
   name: string;
   version?: string;
   license?: string;
+  purpose?: string;
+  summary?: string;
+  description?: string;
+  supplier?: string;
   purls: string[];
 }
 export interface SpdxRelationship {
@@ -48,6 +52,11 @@ function string(value: unknown): string {
 function optional(value: unknown): string | undefined {
   if (value === undefined) return undefined;
   return string(value);
+}
+function displayText(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') return bad('invalid');
+  return value.trim() ? value : undefined;
 }
 function list(value: unknown): unknown[] {
   if (!Array.isArray(value)) return bad('invalid');
@@ -99,6 +108,10 @@ export function readSpdx(input: string): SpdxDocument {
       name: string(p.name),
       version: optional(p.versionInfo),
       license: optional(p.licenseDeclared),
+      purpose: optional(p.primaryPackagePurpose),
+      summary: displayText(p.summary),
+      description: displayText(p.description),
+      supplier: optional(p.supplier),
       purls,
     };
   });
@@ -199,6 +212,10 @@ function readTagValue(text: string): RecordValue {
     } else if (pkg) {
       if (tag === 'PackageVersion') assign(pkg, 'versionInfo', value);
       else if (tag === 'PackageLicenseDeclared') assign(pkg, 'licenseDeclared', value);
+      else if (tag === 'PrimaryPackagePurpose') assign(pkg, 'primaryPackagePurpose', value);
+      else if (tag === 'PackageSummary') assign(pkg, 'summary', value);
+      else if (tag === 'PackageDescription') assign(pkg, 'description', value);
+      else if (tag === 'PackageSupplier') assign(pkg, 'supplier', value);
       else if (tag === 'ExternalRef') {
         const parts = value.trim().split(/\s+/);
         if (parts.length !== 3) return bad('invalid');
@@ -224,6 +241,8 @@ export interface ImportSummary {
   unasserted: number;
   grouped: number;
   shortened: boolean;
+  unknownPurpose: number;
+  representativeCount: number;
 }
 const reverseDependencies = new Set([
   'DEPENDENCY_OF',
@@ -234,6 +253,29 @@ const reverseDependencies = new Set([
   'TEST_DEPENDENCY_OF',
   'RUNTIME_DEPENDENCY_OF',
 ]);
+const purposeNames = new Map<string, [string, string]>([
+  ['FRAMEWORK', ['Frameworks', '프레임워크']],
+  ['LIBRARY', ['Libraries', '라이브러리']],
+  ['APPLICATION', ['Applications', '애플리케이션']],
+  ['CONTAINER', ['Containers', '컨테이너']],
+  ['OPERATING-SYSTEM', ['Operating systems', '운영체제']],
+  ['DEVICE', ['Devices', '장치']],
+  ['FIRMWARE', ['Firmware', '펌웨어']],
+  ['SOURCE', ['Source packages', '소스 패키지']],
+  ['ARCHIVE', ['Archives', '아카이브']],
+  ['FILE', ['Standalone files', '독립 파일 패키지']],
+  ['INSTALL', ['Installers', '설치 프로그램']],
+  ['OTHER', ['Other purposes', '기타 용도']],
+]);
+const scopeNames = new Map<string, [string, string]>([
+  ['RUNTIME_DEPENDENCY_OF', ['Runtime edge', '실행 관계']],
+  ['DEV_DEPENDENCY_OF', ['Development edge', '개발 관계']],
+  ['BUILD_DEPENDENCY_OF', ['Build edge', '빌드 관계']],
+  ['TEST_DEPENDENCY_OF', ['Test edge', '테스트 관계']],
+  ['OPTIONAL_DEPENDENCY_OF', ['Optional edge', '선택 관계']],
+  ['PROVIDED_DEPENDENCY_OF', ['Provided edge', '외부 제공 관계']],
+]);
+const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 const ecosystemNames: Record<string, string> = {
   npm: 'npm',
   pypi: 'PyPI',
@@ -259,6 +301,7 @@ export function toNibmark(
   const allIds = new Set(doc.packages.map((p) => p.id));
   const inventory = doc.packages.filter((p) => p.id !== rootId);
   const edges = new Map<string, Set<string>>();
+  const typedEdges: { from: string; to: string; type: string }[] = [];
   let unresolved = 0;
   let unasserted = 0;
   for (const r of doc.relationships) {
@@ -279,6 +322,7 @@ export function toNibmark(
     }
     if (!edges.has(from)) edges.set(from, new Set());
     edges.get(from)!.add(to);
+    if (scopeNames.has(r.type)) typedEdges.push({ from, to, type: r.type });
   }
   const directIds = new Set(
     rootId ? [...(edges.get(rootId) ?? [])].filter((id) => id !== rootId) : [],
@@ -310,16 +354,73 @@ export function toNibmark(
     `scope ${quote(ko ? 'SBOM 패키지 목록 · 모든 범위' : 'SBOM package inventory · all scopes')}`,
     `source ${quote(`${doc.version} (${doc.format})`)}`,
   ];
+
+  const rootDescription = root?.summary ?? root?.description;
+  if (rootDescription) lines.push(`description ${quote(rootDescription)}`);
+  if (root?.supplier) lines.push(`supplier ${quote(root.supplier)}`);
   if (doc.generator) lines.push(`generator ${quote(doc.generator)}`);
   if (doc.created) lines.push(`created ${quote(doc.created)}`);
-  lines.push(
-    `packages ${inventory.length}`,
-    '',
-    `group ${quote(ko ? '기록된 의존 관계' : 'Recorded relationships')} of packages`,
-    `  item ${quote(ko ? '직접 관계' : 'Direct')} ${direct}`,
-    `  item ${quote(ko ? '간접 관계' : 'Transitive')} ${transitive}`,
-    `  item ${quote(ko ? '미분류' : 'Unclassified')} ${unclassified}`,
-  );
+  lines.push(`packages ${inventory.length}`);
+  const purposeBuckets = new Map<string, SpdxPackage[]>();
+  for (const p of inventory) {
+    const key = p.purpose && purposeNames.has(p.purpose) ? p.purpose : 'UNKNOWN';
+    if (!purposeBuckets.has(key)) purposeBuckets.set(key, []);
+    purposeBuckets.get(key)!.push(p);
+  }
+  const unknownPurpose = purposeBuckets.get('UNKNOWN')?.length ?? 0;
+  let representativeCount = 0;
+  lines.push('', `group ${quote(ko ? '구성 요소' : 'Composition')} of packages`);
+  if (!inventory.length) lines.push(`  item ${quote(ko ? '없음' : 'None listed')} 0`);
+  // Fixed purpose order keeps meaningful categories prominent and unknowns last.
+  // At most 12 named rows overall and 3 per category leave room under MAX_ROWS.
+  for (const key of [...purposeNames.keys(), 'UNKNOWN']) {
+    const members = purposeBuckets.get(key);
+    if (!members) continue;
+    const title =
+      purposeNames.get(key)?.[ko ? 1 : 0] ?? (ko ? '용도 미확인' : 'Unspecified purpose');
+    lines.push(`  item ${quote(title)} ${members.length}`);
+    const names = new Map<string, { count: number; direct: boolean }>();
+    for (const p of members) {
+      const label = clean(p.name + (p.version ? ' @ ' + p.version : ''));
+      const previous = names.get(label);
+      names.set(label, {
+        count: (previous?.count ?? 0) + 1,
+        direct: !!previous?.direct || directIds.has(p.id),
+      });
+    }
+    const representatives = [...names].sort(
+      (a, b) => Number(b[1].direct) - Number(a[1].direct) || compare(a[0], b[0]),
+    );
+    for (const [label, value] of representatives.slice(0, Math.min(3, 12 - representativeCount))) {
+      lines.push(`    includes ${quote(label)} ${value.count}`);
+      representativeCount++;
+    }
+  }
+  lines.push('', `group ${quote(ko ? '기록된 의존 관계' : 'Recorded relationships')} of packages`);
+  const typedMembers = new Map<string, Set<string>>();
+  for (const edge of typedEdges) {
+    // Classify only edges participating in this root's reachable graph.
+    // Direct records require an edge to the root, not a different transitive parent.
+    if (!reached.has(edge.from) || edge.to === rootId) continue;
+    if (directIds.has(edge.to) && edge.from !== rootId) continue;
+    if (!typedMembers.has(edge.type)) typedMembers.set(edge.type, new Set());
+    typedMembers.get(edge.type)!.add(edge.to);
+  }
+  const partitions = [
+    [ko ? '직접 관계' : 'Direct', inventory.filter((p) => directIds.has(p.id))],
+    [
+      ko ? '간접 관계' : 'Transitive',
+      inventory.filter((p) => reached.has(p.id) && !directIds.has(p.id)),
+    ],
+    [ko ? '미분류' : 'Unclassified', inventory.filter((p) => !reached.has(p.id))],
+  ] as const;
+  for (const [label, members] of partitions) {
+    lines.push(`  item ${quote(label)} ${members.length}`);
+    for (const [type, names] of scopeNames) {
+      const count = members.filter((p) => typedMembers.get(type)?.has(p.id)).length;
+      if (count) lines.push(`    includes ${quote(names[ko ? 1 : 0])} ${count}`);
+    }
+  }
   let grouped = 0;
   function group(title: string, labels: string[]) {
     const counts = new Map<string, number>();
@@ -368,8 +469,8 @@ export function toNibmark(
     }),
   );
   const note = ko
-    ? 'SBOM 목록 기준입니다. 의존 관계는 불완전할 수 있습니다. 미분류는 관계를 확인할 수 없는 항목입니다.'
-    : 'SBOM inventory counts. Relationships may be incomplete. Unclassified entries have no established path from the selected project.';
+    ? '대표 패키지만 표시합니다. 용도와 관계는 SBOM 기록 기준이며 불완전할 수 있습니다. 관계 하위 항목은 중복될 수 있으며 실행 범위를 추정하지 않습니다.'
+    : 'Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred.';
   lines.push('', `note ${quote(note)}`);
   const source = lines.join('\n') + '\n';
   if (!parse(source).ok) return bad('invalid');
@@ -384,5 +485,7 @@ export function toNibmark(
     unasserted,
     grouped,
     shortened,
+    unknownPurpose,
+    representativeCount,
   };
 }

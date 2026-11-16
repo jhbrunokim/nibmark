@@ -17,6 +17,8 @@ export interface LabelModel {
   projectVersion?: string;
   serving?: string;
   scope?: string;
+  description?: string;
+  supplier?: string;
   dependencies: number;
   measure?: 'dependencies' | 'packages';
   source?: string;

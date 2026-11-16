@@ -56,3 +56,30 @@ test('malformed and unsupported files keep the editor unchanged; root selection 
   await expect(editor).toHaveValue(/packages 4/);
   await expect(page.getByRole('button', { name: 'Download SVG', exact: true })).toBeEnabled();
 });
+
+test('Pantry API import explains project identity and nests representative ingredients', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Import SPDX', exact: true }).click();
+  const link = page.getByRole('link', { name: 'Download Pantry API example SPDX' });
+  const response = await page.request.get((await link.getAttribute('href'))!);
+  expect(response.ok()).toBe(true);
+  await page.getByLabel('Choose SPDX file').setInputFiles({
+    name: 'pantry.spdx.json',
+    mimeType: 'application/json',
+    buffer: await response.body(),
+  });
+  await expect(page.getByRole('dialog')).toContainText('6 / 18 / 0');
+  await expect(page.getByRole('dialog')).toContainText('Packages without a known purpose: 0');
+  await page.getByRole('button', { name: 'Create label', exact: true }).click();
+  await expect(page.locator('#nibmark-desc')).toContainText('Libraries: 19');
+  await expect(page.locator('#nibmark-desc')).toContainText('Runtime edge: 4');
+  await expect(page.locator('#nibmark-desc')).toContainText(
+    'Supplier: Organization: Pantry Example',
+  );
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download PNG', exact: true }).click();
+  await (await download).saveAs(testInfo.outputPath('pantry-api.png'));
+  await page.screenshot({ path: testInfo.outputPath('pantry-editor.png'), fullPage: true });
+});

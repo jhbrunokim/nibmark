@@ -174,6 +174,8 @@ export function parse(source: string): ParseResult {
           break;
         case 'serving':
         case 'scope':
+        case 'description':
+        case 'supplier':
         case 'source':
         case 'generator':
         case 'created':

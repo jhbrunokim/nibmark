@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-11-16
+
+- Build hierarchical ingredient labels from recorded SPDX package purposes, with representative package names nested beneath each category.
+- Display explicit dependency edge subtypes beneath direct/transitive totals without inheriting scopes or guessing from names.
+- Add description and supplier metadata; import project summary/description and supplier from JSON and Tag/Value.
+- Include a fictional Pantry API SBOM example and explain missing purpose information and representative selection.
+
 ## 0.3.0 — 2026-11-16
 
 - Import SPDX 2.2/2.3 JSON and Tag/Value in the browser with explicit root selection,

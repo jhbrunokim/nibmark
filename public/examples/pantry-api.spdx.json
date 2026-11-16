@@ -1,0 +1,537 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "Pantry API fictional composition",
+  "documentNamespace": "https://example.com/spdx/pantry-api-fictional-1",
+  "creationInfo": {
+    "creators": [
+      "Tool: Nibmark fictional example"
+    ],
+    "created": "2026-11-16T00:00:00Z"
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-App",
+      "name": "Pantry API",
+      "versionInfo": "1.4.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "APPLICATION",
+      "summary": "Node.js REST API \u00b7 PostgreSQL / Redis",
+      "supplier": "Organization: Pantry Example",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-P0",
+      "name": "fastify",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "FRAMEWORK",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/fastify@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P1",
+      "name": "pg",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/pg@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P2",
+      "name": "ioredis",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/ioredis@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P3",
+      "name": "pino",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/pino@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P4",
+      "name": "typescript",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "APPLICATION",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/typescript@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P5",
+      "name": "vitest",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "APPLICATION",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/vitest@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P6",
+      "name": "library-5",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-5@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P7",
+      "name": "library-6",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-6@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P8",
+      "name": "library-7",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-7@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P9",
+      "name": "library-8",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-8@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P10",
+      "name": "library-9",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-9@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P11",
+      "name": "library-10",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-10@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P12",
+      "name": "library-11",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-11@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P13",
+      "name": "library-12",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-12@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P14",
+      "name": "library-13",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-13@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P15",
+      "name": "library-14",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-14@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P16",
+      "name": "library-15",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-15@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P17",
+      "name": "library-16",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-16@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P18",
+      "name": "library-17",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-17@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P19",
+      "name": "library-18",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-18@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P20",
+      "name": "library-19",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "Apache-2.0",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-19@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P21",
+      "name": "library-20",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "licenseDeclared": "Apache-2.0",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/library-20@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P22",
+      "name": "build-helper",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "APPLICATION",
+      "licenseDeclared": "Apache-2.0",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/build-helper@1.0.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-P23",
+      "name": "test-helper",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "APPLICATION",
+      "licenseDeclared": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/test-helper@1.0.0"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P0",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P1",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P2",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P3",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P4",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P5",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-App"
+    },
+    {
+      "spdxElementId": "SPDXRef-P6",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P7",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P8",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P9",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P10",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P11",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P12",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P13",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P14",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P15",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P16",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P17",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P18",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P19",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P20",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P21",
+      "relationshipType": "RUNTIME_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P0"
+    },
+    {
+      "spdxElementId": "SPDXRef-P22",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P4"
+    },
+    {
+      "spdxElementId": "SPDXRef-P23",
+      "relationshipType": "DEV_DEPENDENCY_OF",
+      "relatedSpdxElement": "SPDXRef-P4"
+    }
+  ]
+}

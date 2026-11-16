@@ -78,12 +78,15 @@ test('SPDX import works in Korean on a narrow screen', async ({ page }, testInfo
   await page.goto('/');
   await page.getByRole('button', { name: '한국어', exact: true }).click();
   await page.getByRole('button', { name: 'SPDX 가져오기', exact: true }).click();
-  await page.getByLabel('SPDX 파일 선택').setInputFiles('public/examples/tiny-app.spdx.json');
+  await page.getByLabel('SPDX 파일 선택').setInputFiles('public/examples/pantry-api.spdx.json');
   await expect(page.getByRole('button', { name: '성분표 만들기', exact: true })).toBeEnabled();
   await page.screenshot({ path: testInfo.outputPath('spdx-import-mobile.png'), fullPage: true });
   await page.getByRole('button', { name: '성분표 만들기', exact: true }).click();
   await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
-  await expect(page.locator('#nibmark-desc')).toContainText('패키지: 3');
+  await expect(page.locator('#nibmark-desc')).toContainText('패키지: 24');
+  await expect(page.locator('#nibmark-desc')).toContainText('프레임워크: 1');
+  await expect(page.locator('#nibmark-desc')).toContainText('fastify @ 1.0.0');
+  await expect(page.locator('#nibmark-desc')).toContainText('Node.js REST API');
   const dateWidth = await page
     .locator('[data-testid=label-preview] svg > g > g')
     .last()
