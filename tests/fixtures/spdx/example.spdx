@@ -1,0 +1,39 @@
+SPDXVersion: SPDX-2.2
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: tiny-app inventory
+Creator: Tool: Nibmark fictional example
+Created: 2026-11-16T00:00:00Z
+DocumentNamespace: https://example.com/nibmark/tiny-app-1.0.0
+
+PackageName: tiny-app
+SPDXID: SPDXRef-App
+PackageVersion: 1.0.0
+PackageLicenseDeclared: MIT
+PackageName: first-library
+SPDXID: SPDXRef-A
+PackageVersion: 1.0.0
+PackageLicenseDeclared: MIT
+ExternalRef: PACKAGE-MANAGER purl pkg:npm/first-library@1.0.0
+PackageName: nested-library
+SPDXID: SPDXRef-B
+PackageVersion: 2.0.0
+PackageLicenseDeclared: Apache-2.0
+ExternalRef: PACKAGE-MANAGER purl pkg:npm/nested-library@2.0.0
+PackageName: inventory-only
+SPDXID: SPDXRef-C
+PackageVersion: 3.0.0
+PackageLicenseDeclared: NOASSERTION
+
+FileName: ./source.js
+SPDXID: SPDXRef-File
+FileComment: <text>Multiline text is not a package:
+PackageName: never-count-this
+SPDXID: SPDXRef-Fake
+</text>
+LicenseID: LicenseRef-Example
+ExtractedText: <text>PackageName: also-not-a-package</text>
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-App
+Relationship: SPDXRef-App DEPENDS_ON SPDXRef-A
+Relationship: SPDXRef-B DEPENDENCY_OF SPDXRef-A
+Relationship: SPDXRef-App CONTAINS SPDXRef-C

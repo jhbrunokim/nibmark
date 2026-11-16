@@ -1,7 +1,7 @@
 # Nibmark v1 syntax
 
 Nibmark turns one text definition into a nutrition-style Software Facts label.
-It does not inspect the project being described. Counts are supplied by you.
+It does not inspect the project being described. Counts can be entered manually or converted from an existing SPDX inventory.
 
 ```nibmark
 nutrition v1
@@ -31,14 +31,21 @@ note "Made with care."
 | `project "name" version "version"` | Yes                    | Name; the `version` clause is optional                         |
 | `serving "1 release"`              | No                     | Basis of the label; defaults to one release                    |
 | `scope "Runtime dependencies"`     | No                     | What the numbers describe; defaults to runtime dependencies    |
-| `dependencies 128`                 | Yes                    | Headline count and percentage denominator                      |
+| `dependencies 128`                 | One count declaration                    | Headline count and percentage denominator                      |
 | `group "name" of dependencies`     | At least one           | A complete breakdown of the total                              |
 | `  item "name" 12`                 | At least one per group | Two-space indentation, name and count                          |
 | `    includes "name" 3`            | No                     | Four-space indentation; already included in the preceding item |
 | `note "text"`                      | No                     | Final optional footnote                                        |
 
-Keep declarations in the order shown. `serving` and `scope` can swap places.
-The project, serving, scope, dependencies and note declarations cannot repeat.
+Use one `dependencies N` or `packages N` declaration. The latter displays Packages
+and defaults to an SBOM inventory scope. Every group must use the same denominator:
+`of dependencies` or `of packages`. These counts are never combined in one label.
+
+Optional `source "format"`, `generator "tool"` and `created "timestamp"` declarations
+add provenance below the footnote. They do not verify authenticity or fetch a file.
+They follow `project` and precede the count, in any order with `serving` and `scope`.
+Each metadata declaration and the note can occur only once. `created` is display text;
+it preserves the source timestamp rather than converting time zones.
 The first group title is included in the accessible description, but omitted
 visually to preserve the nutrition-label layout. Later group titles are visible.
 
@@ -47,13 +54,13 @@ visually to preserve the nutrition-label layout. Later group titles are visible.
 - Use double quotes for text. Escapes: `\"`, `\\`, `\n`.
 - Blank lines and lines starting with `#` are allowed.
 - Use spaces, not tabs. Counts must be non-negative safe integers.
-- Each group's items must add up to `dependencies`. Use an explicit
+- Each group's items must add up to the declared headline count. Use an explicit
   `Other` or `Unspecified` item when listing only some ingredients.
 - Included counts cannot exceed their parent. Multiple included items may
   overlap; they are not added together or counted again.
 - Every percentage uses the headline count, including nested items.
 - Percentages round to whole numbers; the rounded total can differ from 100%.
-- With zero dependencies, counts must also be zero and percentages show `—`.
+- With a zero total, counts must also be zero and percentages show `—`.
 - Limits: 50 KB of input, 200 characters per quoted string, 100 item/includes rows.
 
 ## Editor and exports
@@ -84,4 +91,4 @@ code blocks natively.
 
 Invalid input preserves the previous preview, visibly marked as stale, while
 image export is disabled. Saving the source remains available. Opening a file
-or switching examples can be undone with Undo replacement.
+switching examples or applying an SPDX import can be undone with Undo replacement.

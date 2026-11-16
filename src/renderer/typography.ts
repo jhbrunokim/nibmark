@@ -1,4 +1,18 @@
-import type { Font } from 'opentype.js';
+import type { Font, PathCommand } from 'opentype.js';
+
+// Explicit separators prevent rounded negative-zero coordinates from merging
+// with the previous number in the font library's compact path serializer.
+function pathCommand(c: PathCommand): string {
+  if (c.type === 'Z') return 'Z';
+  const values =
+    c.type === 'C'
+      ? [c.x1, c.y1, c.x2, c.y2, c.x, c.y]
+      : c.type === 'Q'
+        ? [c.x1, c.y1, c.x, c.y]
+        : [c.x, c.y];
+  return c.type + ' ' + values.map((n) => n.toFixed(2)).join(' ');
+}
+
 export type Weight = 'regular' | 'bold' | 'black';
 export interface Fonts {
   regular: Font;
@@ -62,8 +76,13 @@ export class Typography {
       .map((r) => {
         const run = this.glyphs(r.font, r.text, size);
         const d = run.positions
-          .map(({ glyph, x }) => glyph.getPath(cursor + x, 0, size).toPathData(2))
-          .join('');
+          .map(({ glyph, x }) =>
+            glyph
+              .getPath(cursor + x, 0, size)
+              .commands.map(pathCommand)
+              .join(' '),
+          )
+          .join(' ');
         cursor += run.width;
         return `<path d="${d}"/>`;
       })

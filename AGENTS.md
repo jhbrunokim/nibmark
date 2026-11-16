@@ -8,3 +8,5 @@
 - Update local `main` before beginning the next round.
 
 - Use the three-part `main.sub.ninor` rules in VERSIONING.md; keep package, lockfile, UI and changelog consistent.
+
+- Nibmark presents existing SBOM outputs. Do not build a project scanner/SBOM generator. Add common presentation concepts rather than tool-specific grammar.

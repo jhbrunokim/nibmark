@@ -174,22 +174,28 @@ export function parse(source: string): ParseResult {
           break;
         case 'serving':
         case 'scope':
-          if (phase !== 1) fail(line, 1, `Put ${cmd} after project and before dependencies.`);
+        case 'source':
+        case 'generator':
+        case 'created':
+          if (phase !== 1) fail(line, 1, `Put ${cmd} after project and before the count.`);
           check(2);
           model[cmd] = text(1);
           break;
         case 'dependencies':
-          if (phase !== 1) fail(line, 1, 'Put dependencies after project, serving and scope.');
+        case 'packages':
+          if (phase !== 1)
+            fail(line, 1, 'Put one dependencies or packages count after project and metadata.');
           check(2);
           model.dependencies = count(1);
+          model.measure = cmd;
           phase = 2;
           break;
         case 'group':
           if (phase !== 2 && phase !== 3)
-            fail(line, 1, 'Put groups after dependencies and before note.');
+            fail(line, 1, 'Put groups after the count and before note.');
           check(4);
           keyword(2, 'of');
-          keyword(3, 'dependencies');
+          keyword(3, model.measure ?? 'dependencies');
           group = { label: text(1), line, items: [] };
           model.groups.push(group);
           phase = 3;
@@ -220,11 +226,16 @@ export function parse(source: string): ParseResult {
       }
       if (rowCount > MAX_ROWS) fail(line, 1, `Use at most ${MAX_ROWS} item/includes rows.`);
     }
-    if (!header || !seen.has('project') || !seen.has('dependencies') || model.groups.length === 0)
+    if (
+      !header ||
+      !seen.has('project') ||
+      (!seen.has('dependencies') && !seen.has('packages')) ||
+      model.groups.length === 0
+    )
       fail(
         Math.max(start + 1, end),
         1,
-        'A label needs nutrition v1, project, dependencies and at least one group.',
+        'A label needs nutrition v1, project, a dependencies or packages count and at least one group.',
       );
     const errors: Diagnostic[] = [];
     for (const g of model.groups) {
@@ -237,7 +248,7 @@ export function parse(source: string): ParseResult {
         errors.push({
           line: g.line,
           column: 1,
-          message: `This group totals ${sum}, but dependencies is ${model.dependencies}. Add an Other/Unspecified item or adjust the counts.`,
+          message: `This group totals ${sum}, but ${model.measure ?? 'dependencies'} is ${model.dependencies}. Add an Other/Unspecified item or adjust the counts.`,
         });
       for (const row of g.items)
         for (const child of row.includes) {
