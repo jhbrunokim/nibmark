@@ -6,9 +6,12 @@ Nibmark turns a small text definition into a familiar, black-and-white **Softwar
 
 [Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.3.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.4.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
-<img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
+<img src="docs/assets/pantry-api.svg" alt="Software Facts for Pantry API: 24 packages, with Fastify nested under Frameworks and PostgreSQL/Redis clients under Libraries. Fictional SPDX data." width="360">
+
+Generated from the [fictional Pantry API SPDX file](public/examples/pantry-api.spdx.json).
+[View the matching Nibmark recipe](docs/examples/pantry-api.nibmark).
 
 ## Get started
 
@@ -32,34 +35,63 @@ The project being described can use any language or framework. Only people devel
 
 ## Example
 
+<details>
+<summary>Pantry API — the recipe behind the label</summary>
+
 ```nibmark
 nutrition v1
-project "tiny-app" version "1.0.0"
-serving "1 release"
-scope "Runtime dependencies"
-dependencies 128
+project "Pantry API" version "1.4.0"
+serving "1 SBOM"
+scope "SBOM package inventory · all scopes"
+source "SPDX-2.3 (JSON)"
+description "Node.js REST API · PostgreSQL / Redis"
+supplier "Organization: Pantry Example"
+generator "Nibmark fictional example"
+created "2026-11-16T00:00:00Z"
+packages 24
 
-group "Dependency composition" of dependencies
-  item "Direct" 12
-  item "Transitive" 116
-    includes "Optional" 16
+group "Composition" of packages
+  item "Frameworks" 1
+    includes "fastify @ 1.0.0" 1
+  item "Libraries" 19
+    includes "ioredis @ 1.0.0" 1
+    includes "pg @ 1.0.0" 1
+    includes "pino @ 1.0.0" 1
+  item "Applications" 4
+    includes "typescript @ 1.0.0" 1
+    includes "vitest @ 1.0.0" 1
+    includes "build-helper @ 1.0.0" 1
 
-group "License declarations" of dependencies
-  item "MIT" 96
-  item "Apache-2.0" 24
-  item "Unspecified" 8
+group "Recorded relationships" of packages
+  item "Direct" 6
+    includes "Runtime edge" 4
+    includes "Development edge" 2
+  item "Transitive" 18
+    includes "Runtime edge" 16
+    includes "Development edge" 2
+  item "Unclassified" 0
 
-note "Made with care. And probably too much coffee."
+group "Declared licenses" of packages
+  item "MIT" 20
+  item "Apache-2.0" 3
+  item "NOASSERTION" 1
+
+group "Package ecosystems" of packages
+  item "npm" 24
+
+note "Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred."
 ```
 
+</details>
+
 The block name is `nibmark`. `nutrition` selects the label type and `v1` the syntax version.
-Counts are entered by the author. Each group must add up to the dependency total.
+Counts can be entered manually or imported from an SBOM. Each group must add up to the headline total.
 An `includes` item is already counted in its parent. `% of Total` describes composition,
 not a recommended dependency allowance.
 
 ## The playground
 
-![Nibmark live editor with text source and a Software Facts preview](docs/assets/playground.png)
+![Nibmark 0.4.0 editor showing the Pantry API recipe and hierarchical Software Facts](docs/assets/pantry-playground.png)
 
 - Import SPDX 2.2/2.3 JSON or Tag/Value with a review of project root and counts.
 - Live text editing with line numbers and precise syntax errors.
@@ -78,7 +110,7 @@ The examples are fictional. Nibmark is a presentation layer for existing SBOMs; 
 After adding the downloaded image to your repository:
 
 ```markdown
-![Software Facts for tiny-app](./tiny-app-facts.svg)
+![Software Facts for Pantry API](./Pantry-API-facts.svg)
 ```
 
 GitHub does not render `nibmark` code blocks natively. Use the exported SVG or PNG.
@@ -143,12 +175,22 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 - Display language is an editor setting. Source is kept in memory until you explicitly save it.
 - Automated browser coverage uses Chromium, Firefox and WebKit. Real Safari/iOS devices still need manual verification.
 
+## Read the ingredients
+
+SPDX imports show package purposes as parent rows and representative package
+names beneath them, like a nutrition label's nested ingredients. Project
+descriptions appear below the heading; explicit dependency subtypes, licenses
+and ecosystems add context. Missing purpose information stays unspecified.
+
+Try **Import SPDX → Download Pantry API example SPDX** in the playground, then
+import that fictional example. See the [field mapping and selection rules](docs/spdx-import.md#hierarchical-ingredients-040).
+
 ## Roadmap
 
 Work proceeds in this order, one round and branch per milestone:
 
 1. Label design review and browser compatibility — completed in 0.2.0.
-2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0.
+2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0; hierarchical ingredients and project descriptions added in 0.4.0.
 3. Broaden SBOM input and presentation: SPDX 3.x JSON-LD, CycloneDX and common metadata.
 4. CLI conversion of existing SBOMs/recipes for README automation.
 5. Markdown renderer integrations.

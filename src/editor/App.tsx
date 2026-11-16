@@ -639,6 +639,12 @@ export function App() {
                 ? '네 칸 들여쓰기. 바로 위 item에 이미 포함된 수치입니다.'
                 : 'Indent by four spaces. Already counted in the parent item.'}
             </dd>
+            <dt>description "REST API" / supplier "Organization: Example"</dt>
+            <dd>
+              {locale === 'ko'
+                ? '프로젝트 설명은 이름 아래에, 공급자는 하단에 표시됩니다. 각 선언은 별도 줄에 적습니다.'
+                : 'Description appears below the name; supplier appears in the footer. Write each declaration on its own line.'}
+            </dd>
             <dt>source "SPDX-2.3" / generator "Syft" / created "2026-11-16"</dt>
             <dd>
               {locale === 'ko'

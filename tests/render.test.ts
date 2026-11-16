@@ -35,6 +35,17 @@ describe('portable label rendering', () => {
     expect(first.description).toContain('Transitive: 116 (91%)');
     expect(first.height).toBeGreaterThan(450);
   });
+  it('renders project description and supplier without treating their values as markup', () => {
+    const m = model(examples.zero);
+    m.description = 'A REST API <service> & database';
+    m.supplier = 'Organization: Example';
+    const output = render(m, fonts);
+    expect(output.height).toBeGreaterThan(render(model(examples.zero), fonts).height);
+    expect(output.description).toContain(m.description);
+    expect(output.description).toContain('Supplier: Organization: Example');
+    expect(output.svg).toContain('&lt;service&gt;');
+    expect(output.svg).not.toContain('<service>');
+  });
   it('treats malicious-looking text as accessible text, never markup', () => {
     const source = examples.zero.replace('just-html', '<script>alert(1)</script> & test');
     const output = render(model(source), fonts);

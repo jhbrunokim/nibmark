@@ -124,10 +124,10 @@ export function SpdxImport({
           <p>
             <a
               className="spdx-doc-link"
-              href={`${import.meta.env.BASE_URL}examples/tiny-app.spdx.json`}
+              href={`${import.meta.env.BASE_URL}examples/pantry-api.spdx.json`}
               download
             >
-              {ko ? '예제 SPDX 파일 받기' : 'Download example SPDX'}
+              {ko ? 'Pantry API 예제 SPDX 받기' : 'Download Pantry API example SPDX'}
             </a>
           </p>
           {loading && <p role="status">{ko ? '목록을 읽는 중…' : 'Reading the inventory…'}</p>}
@@ -183,6 +183,11 @@ export function SpdxImport({
                 {ko
                   ? '목록에 기록된 모든 범위를 집계합니다. 포함 관계(CONTAINS)는 의존 관계로 추측하지 않습니다. 라이선스는 licenseDeclared를 사용하며, 누락·NOASSERTION·NONE을 구분합니다.'
                   : 'Counts cover all scopes in the inventory. CONTAINS is not treated as a dependency. Licenses use licenseDeclared; missing, NOASSERTION and NONE remain distinct.'}
+              </p>
+              <p className="spdx-note">
+                {ko
+                  ? `용도별 대표 항목 ${summary.representativeCount}개를 표시합니다. 용도 미확인 패키지: ${summary.unknownPurpose}개. 관계 하위 항목은 중복될 수 있으며 실행·개발 범위를 상속하지 않습니다.`
+                  : `Showing ${summary.representativeCount} representative entries by recorded purpose. Packages without a known purpose: ${summary.unknownPurpose}. Edge subtypes may overlap; runtime/development scopes are not inherited.`}
               </p>
               {summary.unresolved > 0 && (
                 <p>

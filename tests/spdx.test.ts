@@ -32,10 +32,10 @@ describe('SPDX inventory conversion', () => {
       generator: 'Nibmark fictional example',
       created: '2026-11-16T00:00:00Z',
     });
-    expect(parsed.model.groups[1].items).toEqual(
+    expect(parsed.model.groups.find((g) => g.label === 'Declared licenses')!.items).toEqual(
       expect.arrayContaining([expect.objectContaining({ label: 'NOASSERTION', count: 1 })]),
     );
-    expect(parsed.model.groups[2].items).toEqual(
+    expect(parsed.model.groups.find((g) => g.label === 'Package ecosystems')!.items).toEqual(
       expect.arrayContaining([expect.objectContaining({ label: 'npm', count: 2 })]),
     );
   });
@@ -228,6 +228,153 @@ describe('SPDX inventory conversion', () => {
     ).toThrow('duplicate');
     expect(() => readSpdx(tag + '\nPackageName: broken')).toThrow('invalid');
     expect(() => readSpdx(tag.replaceAll('</text>', ''))).toThrow('invalid');
+  });
+
+  it('turns recorded purposes into parent rows and prioritizes direct named ingredients', () => {
+    const doc = document((r) => {
+      r.packages[0].summary = 'REST API backed by PostgreSQL';
+      r.packages[0].supplier = 'Organization: Example';
+      r.packages[1].primaryPackagePurpose = 'FRAMEWORK';
+      r.packages[1].name = 'fastify';
+      r.packages[2].primaryPackagePurpose = 'LIBRARY';
+      r.packages[2].name = 'pg';
+    });
+    const result = toNibmark(doc, 'SPDXRef-App', 'en');
+    expect(result).toMatchObject({ unknownPurpose: 1, representativeCount: 3 });
+    const parsed = parse(result.source);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.model).toMatchObject({
+      description: 'REST API backed by PostgreSQL',
+      supplier: 'Organization: Example',
+    });
+    expect(parsed.model.groups[0].items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Frameworks',
+          count: 1,
+          includes: [expect.objectContaining({ label: 'fastify @ 1.0.0', count: 1 })],
+        }),
+        expect.objectContaining({
+          label: 'Libraries',
+          count: 1,
+          includes: [expect.objectContaining({ label: 'pg @ 2.0.0', count: 1 })],
+        }),
+        expect.objectContaining({ label: 'Unspecified purpose', count: 1 }),
+      ]),
+    );
+    expect(parse(toNibmark(doc, undefined, 'en').source)).not.toMatchObject({
+      model: { description: 'REST API backed by PostgreSQL' },
+    });
+  });
+  it('reads purpose, description and supplier from Tag/Value text blocks', () => {
+    // Append these fields immediately after a package header, before its other fields.
+    const enriched = readSpdx(
+      tag.replace(
+        /PackageName: ([^\n]+)/,
+        '$&\nPrimaryPackagePurpose: APPLICATION\nPackageSummary: <text>A service\nwith an API</text>\nPackageSupplier: Organization: Example',
+      ),
+    );
+    expect(enriched.packages[0]).toMatchObject({
+      purpose: 'APPLICATION',
+      summary: 'A service\nwith an API',
+      supplier: 'Organization: Example',
+    });
+    expect(toNibmark(enriched, enriched.packages[0].id, 'en').source).toContain(
+      'description "A service with an API"',
+    );
+    expect(enriched.packages).toHaveLength(4);
+  });
+  it('does not guess framework purposes from popular package names', () => {
+    const doc = document((r) => {
+      r.packages[1].name = 'react';
+      r.packages[1].primaryPackagePurpose = 'FUTURE-PURPOSE';
+    });
+    const result = toNibmark(doc, 'SPDXRef-App', 'en');
+    expect(result.unknownPurpose).toBe(3);
+    expect(result.source).toContain('item "Unspecified purpose" 3');
+    expect(result.source).not.toContain('item "Frameworks"');
+  });
+  it('deduplicates typed edges, permits overlap and never inherits runtime scope', () => {
+    const doc = document((r) => {
+      r.relationships = [
+        {
+          spdxElementId: 'SPDXRef-A',
+          relationshipType: 'RUNTIME_DEPENDENCY_OF',
+          relatedSpdxElement: 'SPDXRef-App',
+        },
+        {
+          spdxElementId: 'SPDXRef-A',
+          relationshipType: 'RUNTIME_DEPENDENCY_OF',
+          relatedSpdxElement: 'SPDXRef-App',
+        },
+        {
+          spdxElementId: 'SPDXRef-A',
+          relationshipType: 'DEV_DEPENDENCY_OF',
+          relatedSpdxElement: 'SPDXRef-App',
+        },
+        {
+          spdxElementId: 'SPDXRef-A',
+          relationshipType: 'DEPENDS_ON',
+          relatedSpdxElement: 'SPDXRef-B',
+        },
+        // An unreachable parent must not classify B as a test dependency.
+        {
+          spdxElementId: 'SPDXRef-B',
+          relationshipType: 'TEST_DEPENDENCY_OF',
+          relatedSpdxElement: 'SPDXRef-C',
+        },
+      ];
+    });
+    const result = toNibmark(doc, 'SPDXRef-App', 'en');
+    const parsed = parse(result.source);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const rows = parsed.model.groups.find((g) => g.label === 'Recorded relationships')!.items;
+    expect(rows[0].includes.map((i) => [i.label, i.count])).toEqual([
+      ['Runtime edge', 1],
+      ['Development edge', 1],
+    ]);
+    expect(rows[1]).toMatchObject({ count: 1, includes: [] });
+    expect(rows[2]).toMatchObject({ count: 1, includes: [] });
+  });
+  it('prioritizes direct representatives, aggregates same name/version and bounds every group', () => {
+    const doc = document((r) => {
+      r.packages = [
+        r.packages[0],
+        ...Array.from({ length: 400 }, (_, i) => ({
+          SPDXID: 'SPDXRef-' + i,
+          name: i < 2 ? 'z-direct' : 'a-' + i,
+          versionInfo: '1',
+          primaryPackagePurpose: 'LIBRARY',
+          licenseDeclared: 'LicenseRef-' + i,
+          externalRefs: [
+            { referenceType: 'purl', referenceLocator: 'pkg:ecosystem' + i + '/package' },
+          ],
+        })),
+      ];
+      r.relationships = [
+        {
+          spdxElementId: 'SPDXRef-App',
+          relationshipType: 'DEPENDS_ON',
+          relatedSpdxElement: 'SPDXRef-0',
+        },
+      ];
+    });
+    const result = toNibmark(doc, 'SPDXRef-App', 'en');
+    const parsed = parse(result.source);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.model.groups[0].items[0].includes[0]).toMatchObject({
+      label: 'z-direct @ 1',
+      count: 2,
+    });
+    expect(result.representativeCount).toBe(3);
+    for (const group of parsed.model.groups)
+      expect(group.items.reduce((n, i) => n + i.count, 0)).toBe(400);
+    expect(
+      toNibmark({ ...doc, packages: [...doc.packages].reverse() }, 'SPDXRef-App', 'en').source,
+    ).toBe(result.source);
   });
   it('bounds file and collection sizes', () => {
     expect(() => readSpdx(' '.repeat(MAX_SPDX_BYTES + 1))).toThrow('size');
