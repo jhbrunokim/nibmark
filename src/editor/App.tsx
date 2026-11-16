@@ -6,6 +6,7 @@ import { render, type RenderedLabel } from '../renderer/render';
 import { download, filename, markdown, png } from './exports';
 import { readShare, shareURL, ShareError } from './share';
 import { version } from '../../package.json';
+import { SpdxImport } from './SpdxImport';
 
 const copy = {
   en: {
@@ -49,7 +50,7 @@ const copy = {
     close: 'Close',
     guideTitle: 'A small language for your ingredients.',
     guideIntro: 'Describe the contents. Nibmark takes care of the label.',
-    note: 'Counts are entered by you. Percentages are calculated from dependencies.',
+    note: 'Edit the counts or import an SBOM. Percentages use the headline total.',
     undo: 'Undo replacement',
     fix: 'Fix the recipe to export the current label.',
     retry: 'Retry fonts',
@@ -99,7 +100,7 @@ const copy = {
     close: '닫기',
     guideTitle: '프로젝트의 재료를 적는 작은 언어.',
     guideIntro: '내용만 적으세요. 배치는 Nibmark가 맡습니다.',
-    note: '개수는 직접 입력하고, 비율은 전체 의존성을 기준으로 계산합니다.',
+    note: '개수를 편집하거나 SBOM을 가져오세요. 비율은 대표 수치를 기준으로 계산합니다.',
     undo: '교체 되돌리기',
     fix: '현재 라벨을 내보내려면 입력을 수정하세요.',
     retry: '글꼴 다시 불러오기',
@@ -389,6 +390,7 @@ export function App() {
             </div>
           </div>
         </div>
+        <SpdxImport locale={locale} onApply={(source) => replace(source)} />
         <div className="workspace">
           <section className="source-pane" aria-label={c.source}>
             <div className="pane-heading">
@@ -616,8 +618,8 @@ export function App() {
             <dt>dependencies 42</dt>
             <dd>
               {locale === 'ko'
-                ? '크게 표시할 전체 의존성 수입니다.'
-                : 'The headline number and denominator for percentages.'}
+                ? '전체 의존성 수입니다. SBOM 목록 전체를 셀 때는 packages를 사용하세요.'
+                : 'The headline number and denominator. Use packages for an SBOM inventory, dependencies for dependency counts.'}
             </dd>
             <dt>group "Composition" of dependencies</dt>
             <dd>
@@ -636,6 +638,12 @@ export function App() {
               {locale === 'ko'
                 ? '네 칸 들여쓰기. 바로 위 item에 이미 포함된 수치입니다.'
                 : 'Indent by four spaces. Already counted in the parent item.'}
+            </dd>
+            <dt>source "SPDX-2.3" / generator "Syft" / created "2026-11-16"</dt>
+            <dd>
+              {locale === 'ko'
+                ? '선택적인 출처·생성 도구·생성 시점. project 다음, 개수 앞에 적습니다.'
+                : 'Optional source, tool and timestamp. Place each on its own line after project and before the count.'}
             </dd>
             <dt>note "A little extra flavor."</dt>
             <dd>

@@ -18,6 +18,10 @@ export interface LabelModel {
   serving?: string;
   scope?: string;
   dependencies: number;
+  measure?: 'dependencies' | 'packages';
+  source?: string;
+  generator?: string;
+  created?: string;
   groups: Group[];
   note?: string;
 }

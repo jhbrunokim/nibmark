@@ -2,11 +2,11 @@
 
 **Give your project a nutrition label.**
 
-Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Describe the ingredients; Nibmark handles the typography, layout, and percentages.
+Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Import an existing SBOM or describe the ingredients; Nibmark handles the typography, layout, and percentages.
 
-[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [Contributing](CONTRIBUTING.md)
+[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.2.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.3.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/software-facts.svg" alt="Software Facts for tiny-app: 128 runtime dependencies, 12 direct and 116 transitive. The example uses fictional data." width="360">
 
@@ -61,6 +61,7 @@ not a recommended dependency allowance.
 
 ![Nibmark live editor with text source and a Software Facts preview](docs/assets/playground.png)
 
+- Import SPDX 2.2/2.3 JSON or Tag/Value with a review of project root and counts.
 - Live text editing with line numbers and precise syntax errors.
 - A fixed nutrition-label layout: bold headline, thick rules, nested ingredients.
 - English and Korean interface and label wording.
@@ -70,7 +71,7 @@ not a recommended dependency allowance.
 - Processing in browser memory; label contents are not sent to a server.
 - Outlined SVG text preserves the appearance without installed fonts.
 
-The examples are fictional. The first version does not analyze repositories or import SBOMs.
+The examples are fictional. Nibmark is a presentation layer for existing SBOMs; it does not scan repositories or generate SBOMs.
 
 ## Put it in your README
 
@@ -82,6 +83,13 @@ After adding the downloaded image to your repository:
 
 GitHub does not render `nibmark` code blocks natively. Use the exported SVG or PNG.
 If you put the image in another directory, update the Markdown path.
+
+## Start from an SBOM
+
+Choose **Import SPDX**, open an SPDX 2.2/2.3 JSON or Tag/Value file, review the project
+root and counts, and select **Create label**. Package totals, recorded relationships,
+declared licenses, ecosystems and provenance become editable text. No file is uploaded.
+See the [generator compatibility and counting rules](docs/spdx-import.md).
 
 ## Share an editable label
 
@@ -105,6 +113,7 @@ Text → parser → label model → validation → layout → SVG
 - `src/core/`: framework-independent parser, model and count validation.
 - `src/renderer/`: font measurement, nutrition layout and self-contained SVG.
 - `src/editor/`: React playground, file operations and browser image exports.
+- `src/importers/`: SPDX inventory normalization and conversion to editable Nibmark.
 - `tests/`: parser, rendering, export and end-to-end tests.
 
 One renderer serves both preview and download. The web editor is React + Vite;
@@ -127,7 +136,7 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 
 ## Current limits
 
-- One label type: `nutrition v1`; all composition groups use the dependency count as their denominator.
+- One label type: `nutrition v1`; all composition groups use the selected dependencies or packages count as their denominator.
 - English, Korean and supported Latin characters/symbols. Unsupported characters, including most emoji, are reported as errors.
 - 50 KB input, 200 characters per quoted string, 100 ingredient rows.
 - Very tall labels can use SVG; PNG is capped at 16,000 pixels high and 16 megapixels.
@@ -139,10 +148,13 @@ Korean, mobile overflow and visual snapshots. See [Contributing](CONTRIBUTING.md
 Work proceeds in this order, one round and branch per milestone:
 
 1. Label design review and browser compatibility — completed in 0.2.0.
-2. Import existing SBOM files into the label model — next.
-3. Analyze projects, starting with npm package-lock.json.
-4. CLI generation for README automation.
+2. Import existing SBOM files — SPDX 2.2/2.3 JSON and Tag/Value completed in 0.3.0.
+3. Broaden SBOM input and presentation: SPDX 3.x JSON-LD, CycloneDX and common metadata.
+4. CLI conversion of existing SBOMs/recipes for README automation.
 5. Markdown renderer integrations.
+
+Product direction: make existing generators' results easy to read and share.
+Building another SBOM generator or repository analyzer is outside the roadmap.
 
 See [versioning](VERSIONING.md) and [changes](CHANGELOG.md) for release tracking.
 

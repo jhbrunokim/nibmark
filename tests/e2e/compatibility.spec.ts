@@ -41,7 +41,7 @@ test('Korean shared recipe supports editing, SVG/PNG export and source round tri
   await editor.fill('nutrition v9');
   await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeDisabled();
   await page
-    .locator('input[type=file]')
+    .getByLabel('Open source file')
     .setInputFiles({ name: 'recipe.nibmark', mimeType: 'text/plain', buffer: saved });
   await expect(editor).toHaveValue(source);
   await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
@@ -67,4 +67,29 @@ test('long labels and zero totals remain readable at a 320px viewport', async ({
   expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await page.screenshot({ path: testInfo.outputPath('long-mobile.png'), fullPage: true });
+});
+
+test('SPDX import works in Korean on a narrow screen', async ({ page }, testInfo) => {
+  const pathErrors: string[] = [];
+  page.on('console', (m) => {
+    if (m.type() === 'error' && m.text().includes('attribute d')) pathErrors.push(m.text());
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: '한국어', exact: true }).click();
+  await page.getByRole('button', { name: 'SPDX 가져오기', exact: true }).click();
+  await page.getByLabel('SPDX 파일 선택').setInputFiles('public/examples/tiny-app.spdx.json');
+  await expect(page.getByRole('button', { name: '성분표 만들기', exact: true })).toBeEnabled();
+  await page.screenshot({ path: testInfo.outputPath('spdx-import-mobile.png'), fullPage: true });
+  await page.getByRole('button', { name: '성분표 만들기', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
+  await expect(page.locator('#nibmark-desc')).toContainText('패키지: 3');
+  const dateWidth = await page
+    .locator('[data-testid=label-preview] svg > g > g')
+    .last()
+    .evaluate((el) => (el as SVGGraphicsElement).getBBox().width);
+  expect(dateWidth).toBeGreaterThan(100);
+  expect(pathErrors).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath('spdx-label-mobile.png'), fullPage: true });
 });

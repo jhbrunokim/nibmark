@@ -32,8 +32,8 @@ design sample. Also check long names, zero dependencies, and narrow screens.
 SVG output must remain self-contained and must never execute input text.
 
 New syntax must include valid examples and error-location tests. Document
-changes in `docs/syntax.md`. Keep automated analysis and additional label
-types outside v0.1 unless the scope is agreed first.
+changes in `docs/syntax.md`. Keep project scanning and SBOM generation outside the product scope. Input adapters
+should consume existing SBOMs and preserve uncertainty instead of guessing metadata.
 
 ## Working in rounds
 

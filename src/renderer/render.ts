@@ -16,6 +16,14 @@ const escape = (s: string) =>
 
 export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): RenderedLabel {
   const ko = locale === 'ko';
+  const packages = model.measure === 'packages';
+  const defaultScope = packages
+    ? ko
+      ? 'SBOM 패키지 목록'
+      : 'SBOM package inventory'
+    : ko
+      ? '실행용 의존성'
+      : 'Runtime dependencies';
   const t = new Typography(fonts);
   const shapes: string[] = [];
   const left = 11,
@@ -70,15 +78,8 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
   y -= 13;
   rule(12);
   y += 19;
-  wrapped(
-    model.scope ?? (ko ? '실행용 의존성' : 'Runtime dependencies'),
-    13,
-    'bold',
-    left,
-    width,
-    17,
-  );
-  const headline = ko ? '의존성' : 'Dependencies';
+  wrapped(model.scope ?? defaultScope, 13, 'bold', left, width, 17);
+  const headline = packages ? (ko ? '패키지' : 'Packages') : ko ? '의존성' : 'Dependencies';
   const value = String(model.dependencies);
   const valueWidth = t.width(value, 45, 'black');
   y += 26;
@@ -143,18 +144,27 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
   rule(6);
   y += 18;
   const footnote = ko
-    ? `* 비율은 위 범위의 전체 의존성 ${model.dependencies}개를 기준으로 합니다. 포함 항목은 상위 수치에 이미 들어 있습니다. 비율은 반올림했습니다.${model.dependencies === 0 ? ' 전체가 0이면 비율은 —로 표시합니다.' : ''}`
-    : `* Percentages use the ${model.dependencies} dependencies in the scope above. Included items are already counted in their parent. Percentages are rounded.${model.dependencies === 0 ? ' A zero total has no percentage (—).' : ''}`;
+    ? `* 비율은 위 범위의 전체 ${packages ? '패키지' : '의존성'} ${model.dependencies}개를 기준으로 합니다. 포함 항목은 상위 수치에 이미 들어 있습니다. 비율은 반올림했습니다.${model.dependencies === 0 ? ' 전체가 0이면 비율은 —로 표시합니다.' : ''}`
+    : `* Percentages use the ${model.dependencies} ${packages ? 'packages' : 'dependencies'} in the scope above. Included items are already counted in their parent. Percentages are rounded.${model.dependencies === 0 ? ' A zero total has no percentage (—).' : ''}`;
   wrapped(footnote, 11.3, 'regular', left, width, 14.5);
   if (model.note) {
     y += 8;
     wrapped(model.note, 12, 'regular', left, width, 15);
   }
+  const provenance = [
+    model.source && `${ko ? '출처' : 'Source'}: ${model.source}`,
+    model.generator && `${ko ? '생성 도구' : 'Generator'}: ${model.generator}`,
+    model.created && `${ko ? '생성 시점' : 'Created'}: ${model.created}`,
+  ].filter((v): v is string => Boolean(v));
+  if (provenance.length) {
+    y += 6;
+    for (const line of provenance) wrapped(line, 10, 'regular', left, width, 13);
+  }
   const height = Math.ceil(y + 8);
   const title = `${ko ? '소프트웨어 성분표' : 'Software Facts'} — ${model.project}`;
   const description = [
     title,
-    `${serving}. ${model.scope ?? (ko ? '실행용 의존성' : 'Runtime dependencies')}.`,
+    `${serving}. ${model.scope ?? defaultScope}.`,
     `${headline}: ${value}.`,
     ...model.groups.flatMap((g) => [
       g.label,
@@ -168,6 +178,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     ]),
     footnote,
     model.note ?? '',
+    ...provenance,
   ].join(' ');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="${height}" viewBox="0 0 360 ${height}" role="img" aria-labelledby="nibmark-title nibmark-desc"><title id="nibmark-title">${escape(title)}</title><desc id="nibmark-desc">${escape(description)}</desc><rect width="360" height="${height}" fill="#fff"/><rect x="2" y="2" width="356" height="${height - 4}" fill="none" stroke="#000" stroke-width="2.5"/><g fill="#000" aria-hidden="true">${shapes.join('')}</g></svg>`;
   return { svg, width: 360, height, description };

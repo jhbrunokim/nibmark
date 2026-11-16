@@ -85,3 +85,22 @@ describe('Nibmark documents', () => {
     expect(percent(12, 128)).toBe('9%');
   });
 });
+
+it('accepts inventory and provenance keywords without changing dependency recipes', () => {
+  const result = parse(
+    'nutrition v1\nproject "demo"\nsource "SPDX-2.3"\ngenerator "Syft"\ncreated "2026-11-16"\npackages 1\ngroup "Licenses" of packages\n  item "MIT" 1',
+  );
+  expect(result.ok).toBe(true);
+  if (result.ok)
+    expect(result.model).toMatchObject({
+      measure: 'packages',
+      dependencies: 1,
+      source: 'SPDX-2.3',
+      generator: 'Syft',
+      created: '2026-11-16',
+    });
+  expect(
+    parse('nutrition v1\nproject "demo"\npackages 1\ngroup "Wrong" of dependencies\n  item "MIT" 1')
+      .ok,
+  ).toBe(false);
+});

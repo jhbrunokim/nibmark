@@ -57,13 +57,11 @@ test('edit, recover from errors, export SVG/PNG and reopen a saved recipe', asyn
   await page.getByRole('button', { name: 'Save source' }).click();
   const save = await savePromise;
   await page.getByLabel('Example', { exact: true }).selectOption('zero');
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'my-project.nibmark',
-      mimeType: 'text/plain',
-      buffer: Buffer.from(await readFile((await save.path())!, 'utf8')),
-    });
+  await page.getByLabel('Open source file').setInputFiles({
+    name: 'my-project.nibmark',
+    mimeType: 'text/plain',
+    buffer: Buffer.from(await readFile((await save.path())!, 'utf8')),
+  });
   await expect(editor).toHaveValue(original.replace('tiny-app', 'my-project'));
   await expect(page.getByRole('button', { name: 'Download SVG' })).toBeEnabled();
   expect(errors).toEqual([]);
@@ -89,13 +87,11 @@ test('Korean label, guide, mobile layout and invalid file handling', async ({ pa
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   const before = await page.getByRole('textbox', { name: 'Nibmark 문법 입력' }).inputValue();
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'large.nibmark',
-      mimeType: 'text/plain',
-      buffer: Buffer.from('x'.repeat(51201)),
-    });
+  await page.getByLabel('Open source file').setInputFiles({
+    name: 'large.nibmark',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('x'.repeat(51201)),
+  });
   await expect(page.getByRole('alert')).toContainText('50 KB');
   await expect(page.getByRole('textbox', { name: 'Nibmark 문법 입력' })).toHaveValue(before);
   await page.setViewportSize({ width: 390, height: 844 });

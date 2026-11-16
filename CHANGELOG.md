@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 — 2026-11-16
+
+- Import SPDX 2.2/2.3 JSON and Tag/Value in the browser with explicit root selection,
+  dependency uncertainty, declared-license and PURL ecosystem summaries.
+- Add packages, source, generator and created presentation keywords while retaining
+  existing dependencies recipes.
+- Distinguish NONE/NOASSERTION relationship assertions from unresolved references,
+  and validate inventory identifiers against the SPDX 2.x rules.
+- Fix SVG glyph coordinate serialization that could truncate timestamp text.
+- Refocus the roadmap on presenting existing SBOMs, additional format adapters and README integrations.
+
 ## 0.2.0 — 2026-11-16
 
 - Share editable recipes and display language through a browser-only link.
