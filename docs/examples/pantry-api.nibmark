@@ -1,0 +1,41 @@
+nutrition v1
+project "Pantry API" version "1.4.0"
+serving "1 SBOM"
+scope "SBOM package inventory · all scopes"
+source "SPDX-2.3 (JSON)"
+description "Node.js REST API · PostgreSQL / Redis"
+supplier "Organization: Pantry Example"
+generator "Nibmark fictional example"
+created "2026-11-16T00:00:00Z"
+packages 24
+
+group "Composition" of packages
+  item "Frameworks" 1
+    includes "fastify @ 1.0.0" 1
+  item "Libraries" 19
+    includes "ioredis @ 1.0.0" 1
+    includes "pg @ 1.0.0" 1
+    includes "pino @ 1.0.0" 1
+  item "Applications" 4
+    includes "typescript @ 1.0.0" 1
+    includes "vitest @ 1.0.0" 1
+    includes "build-helper @ 1.0.0" 1
+
+group "Recorded relationships" of packages
+  item "Direct" 6
+    includes "Runtime edge" 4
+    includes "Development edge" 2
+  item "Transitive" 18
+    includes "Runtime edge" 16
+    includes "Development edge" 2
+  item "Unclassified" 0
+
+group "Declared licenses" of packages
+  item "MIT" 20
+  item "Apache-2.0" 3
+  item "NOASSERTION" 1
+
+group "Package ecosystems" of packages
+  item "npm" 24
+
+note "Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred."

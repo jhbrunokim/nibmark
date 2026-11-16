@@ -1,3 +1,4 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 
 test('review SPDX then create, edit, export and undo the label', async ({ page }) => {
@@ -82,4 +83,17 @@ test('Pantry API import explains project identity and nests representative ingre
   await page.getByRole('button', { name: 'Download PNG', exact: true }).click();
   await (await download).saveAs(testInfo.outputPath('pantry-api.png'));
   await page.screenshot({ path: testInfo.outputPath('pantry-editor.png'), fullPage: true });
+  if (process.env.UPDATE_SPDX_EXAMPLE === '1') {
+    mkdirSync('docs/examples', { recursive: true });
+    writeFileSync(
+      'docs/examples/pantry-api.nibmark',
+      await page.getByRole('textbox', { name: 'Nibmark source' }).inputValue(),
+    );
+    const svgDownload = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download SVG', exact: true }).click();
+    await (await svgDownload).saveAs('docs/assets/pantry-api.svg');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'docs/assets/pantry-playground.png', fullPage: false });
+  }
 });
