@@ -26,7 +26,9 @@ export interface SpdxRelationship {
   type: string;
   to: string;
 }
+export type SpdxWarning = 'missing-document-name' | 'nonstandard-document-id';
 export interface SpdxDocument {
+  warnings: SpdxWarning[];
   version: string;
   format: 'JSON' | 'Tag/Value';
   id: string;
@@ -87,8 +89,11 @@ export function readSpdx(input: string): SpdxDocument {
   const version = string(raw.spdxVersion);
   if (!['SPDX-2.2', 'SPDX-2.3'].includes(version)) return bad('version');
   const id = string(raw.SPDXID);
-  if (id !== 'SPDXRef-DOCUMENT') return bad('invalid');
-  const name = string(raw.name);
+  if (!/^SPDXRef-[a-zA-Z0-9.-]+$/.test(id)) return bad('invalid');
+  const warnings: SpdxWarning[] = [];
+  if (id !== 'SPDXRef-DOCUMENT') warnings.push('nonstandard-document-id');
+  const name = displayText(raw.name);
+  if (!name) warnings.push('missing-document-name');
   if (raw.packages === undefined) return bad('packages');
   const packagesRaw = list(raw.packages);
   if (packagesRaw.length > MAX_PACKAGES) return bad('limit');
@@ -138,7 +143,8 @@ export function readSpdx(input: string): SpdxDocument {
     version,
     format,
     id,
-    name,
+    name: name ?? 'Untitled SBOM',
+    warnings,
     packages,
     relationships,
     roots: [...roots].filter((ref) => ref !== id && ids.has(ref)),
@@ -243,6 +249,7 @@ export interface ImportSummary {
   shortened: boolean;
   unknownPurpose: number;
   representativeCount: number;
+  compositionBasis: 'purpose' | 'ecosystem';
 }
 const reverseDependencies = new Set([
   'DEPENDENCY_OF',
@@ -289,6 +296,23 @@ const ecosystemNames: Record<string, string> = {
   apk: 'Alpine',
   rpm: 'RPM',
 };
+
+function ecosystem(p: SpdxPackage, ko: boolean): string {
+  const types = new Set(
+    p.purls
+      .map((url) => /^pkg:([a-z][a-z0-9.+-]*)\//.exec(url)?.[1])
+      .filter((v): v is string => !!v),
+  );
+  if (types.size > 1) return ko ? '여러 생태계' : 'Multiple ecosystems';
+  const type = [...types][0];
+  return type
+    ? Object.hasOwn(ecosystemNames, type)
+      ? ecosystemNames[type]
+      : type
+    : ko
+      ? '미확인'
+      : 'Unknown';
+}
 
 export function toNibmark(
   doc: SpdxDocument,
@@ -349,7 +373,7 @@ export function toNibmark(
   const quote = (s: string) => JSON.stringify(clean(s));
   const lines = [
     'nutrition v1',
-    `project ${quote(root?.name ?? doc.name)}${root?.version ? ' version ' + quote(root.version) : ''}`,
+    `project ${quote(root?.name ?? (doc.warnings.includes('missing-document-name') && ko ? '이름 없는 SBOM' : doc.name))}${root?.version ? ' version ' + quote(root.version) : ''}`,
     `serving ${quote(ko ? 'SBOM 1개' : '1 SBOM')}`,
     `scope ${quote(ko ? 'SBOM 패키지 목록 · 모든 범위' : 'SBOM package inventory · all scopes')}`,
     `source ${quote(`${doc.version} (${doc.format})`)}`,
@@ -368,16 +392,51 @@ export function toNibmark(
     purposeBuckets.get(key)!.push(p);
   }
   const unknownPurpose = purposeBuckets.get('UNKNOWN')?.length ?? 0;
+  let grouped = 0;
   let representativeCount = 0;
-  lines.push('', `group ${quote(ko ? '구성 요소' : 'Composition')} of packages`);
+  const unknownEcosystem = ko ? '미확인' : 'Unknown';
+  const useEcosystems =
+    inventory.length > 0 &&
+    unknownPurpose === inventory.length &&
+    inventory.some((p) => ecosystem(p, ko) !== unknownEcosystem);
+  const compositionBasis = useEcosystems ? 'ecosystem' : 'purpose';
+  let composition: [string, SpdxPackage[]][];
+  if (useEcosystems) {
+    const buckets = new Map<string, SpdxPackage[]>();
+    for (const p of inventory) {
+      const label = ecosystem(p, ko);
+      if (!buckets.has(label)) buckets.set(label, []);
+      buckets.get(label)!.push(p);
+    }
+    const sorted = [...buckets].sort((a, b) => b[1].length - a[1].length || compare(a[0], b[0]));
+    composition = sorted.slice(0, 20);
+    if (sorted.length > 20) {
+      grouped += sorted.length - 20;
+      composition.push([
+        ko ? '기타 생태계 (묶음)' : 'Other ecosystems (grouped)',
+        sorted.slice(20).flatMap(([, members]) => members),
+      ]);
+    }
+  } else {
+    composition = [...purposeNames.keys(), 'UNKNOWN'].flatMap((key) => {
+      const members = purposeBuckets.get(key);
+      return members
+        ? [
+            [
+              purposeNames.get(key)?.[ko ? 1 : 0] ?? (ko ? '용도 미확인' : 'Unspecified purpose'),
+              members,
+            ] as [string, SpdxPackage[]],
+          ]
+        : [];
+    });
+  }
+  lines.push(
+    '',
+    `group ${quote(useEcosystems ? (ko ? '패키지 생태계' : 'Package ecosystems') : ko ? '구성 요소' : 'Composition')} of packages`,
+  );
   if (!inventory.length) lines.push(`  item ${quote(ko ? '없음' : 'None listed')} 0`);
-  // Fixed purpose order keeps meaningful categories prominent and unknowns last.
   // At most 12 named rows overall and 3 per category leave room under MAX_ROWS.
-  for (const key of [...purposeNames.keys(), 'UNKNOWN']) {
-    const members = purposeBuckets.get(key);
-    if (!members) continue;
-    const title =
-      purposeNames.get(key)?.[ko ? 1 : 0] ?? (ko ? '용도 미확인' : 'Unspecified purpose');
+  for (const [title, members] of composition) {
     lines.push(`  item ${quote(title)} ${members.length}`);
     const names = new Map<string, { count: number; direct: boolean }>();
     for (const p of members) {
@@ -421,7 +480,6 @@ export function toNibmark(
       if (count) lines.push(`    includes ${quote(names[ko ? 1 : 0])} ${count}`);
     }
   }
-  let grouped = 0;
   function group(title: string, labels: string[]) {
     const counts = new Map<string, number>();
     for (const label of labels) counts.set(label, (counts.get(label) ?? 0) + 1);
@@ -449,29 +507,31 @@ export function toNibmark(
       return p.license;
     }),
   );
-  group(
-    ko ? '패키지 생태계' : 'Package ecosystems',
-    inventory.map((p) => {
-      const types = new Set(
-        p.purls
-          .map((url) => /^pkg:([a-z][a-z0-9.+-]*)\//.exec(url)?.[1])
-          .filter((v): v is string => !!v),
-      );
-      if (types.size > 1) return ko ? '여러 생태계' : 'Multiple ecosystems';
-      const type = [...types][0];
-      return type
-        ? Object.hasOwn(ecosystemNames, type)
-          ? ecosystemNames[type]
-          : type
-        : ko
-          ? '미확인'
-          : 'Unknown';
-    }),
-  );
-  const note = ko
-    ? '대표 패키지만 표시합니다. 용도와 관계는 SBOM 기록 기준이며 불완전할 수 있습니다. 관계 하위 항목은 중복될 수 있으며 실행 범위를 추정하지 않습니다.'
-    : 'Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred.';
-  lines.push('', `note ${quote(note)}`);
+  if (!useEcosystems)
+    group(
+      ko ? '패키지 생태계' : 'Package ecosystems',
+      inventory.map((p) => ecosystem(p, ko)),
+    );
+  const notes = ko
+    ? [
+        useEcosystems
+          ? '용도 정보가 없어 PURL 생태계로 구성했습니다.'
+          : '용도는 SBOM 기록 기준입니다.',
+        '대표 패키지만 표시합니다. 관계는 불완전하거나 중복될 수 있으며 실행 범위를 추정하지 않습니다.',
+      ]
+    : [
+        useEcosystems
+          ? 'No purpose data; grouped by PURL ecosystem.'
+          : 'Purposes follow SBOM records.',
+        'Selected names only. Edges may be incomplete or overlap; runtime scope is not inferred.',
+      ];
+  if (doc.warnings.length)
+    notes.push(
+      ko
+        ? '원본 문서 메타데이터가 불완전하거나 비표준입니다.'
+        : 'Source metadata is incomplete or nonstandard.',
+    );
+  lines.push('', `note ${quote(notes.join(' '))}`);
   const source = lines.join('\n') + '\n';
   if (!parse(source).ok) return bad('invalid');
   return {
@@ -487,5 +547,6 @@ export function toNibmark(
     shortened,
     unknownPurpose,
     representativeCount,
+    compositionBasis,
   };
 }

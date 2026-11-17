@@ -96,3 +96,27 @@ test('SPDX import works in Korean on a narrow screen', async ({ page }, testInfo
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({ path: testInfo.outputPath('spdx-label-mobile.png'), fullPage: true });
 });
+
+test('upstream metadata gaps are explained and ambiguous identities do not replace the recipe', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: '한국어', exact: true }).click();
+  const editor = page.getByRole('textbox', { name: 'Nibmark 문법 입력' });
+  const before = await editor.inputValue();
+  await page.getByRole('button', { name: 'SPDX 가져오기', exact: true }).click();
+  const file = page.getByLabel('SPDX 파일 선택');
+  await file.setInputFiles('tests/fixtures/spdx/upstream/trivy-no-relationship.json');
+  await expect(page.getByRole('alert')).toContainText('문서·패키지의 SPDX ID');
+  await expect(editor).toHaveValue(before);
+  await file.setInputFiles('tests/fixtures/spdx/upstream/syft-tag-value.spdx');
+  await expect(page.getByRole('dialog')).toContainText('원본에 문서 이름이 없습니다.');
+  await expect(page.getByRole('dialog')).toContainText('PURL 생태계별로 구성했습니다.');
+  await page.getByRole('button', { name: '성분표 만들기', exact: true }).click();
+  await expect(page.locator('#nibmark-desc')).toContainText('Alpine: 1');
+  await expect(page.locator('#nibmark-desc')).toContainText('Maven: 3');
+  await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath('upstream-fallback.png'), fullPage: true });
+});

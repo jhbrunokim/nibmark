@@ -1,0 +1,66 @@
+[
+  {
+    "file": "syft-alpine.json",
+    "repository": "anchore/syft",
+    "commit": "63ab0acead6162a91f8e31fa6537f7bed8430e58",
+    "path": "syft/format/spdxjson/testdata/spdx/alpine-3.10.syft.spdx.json",
+    "url": "https://raw.githubusercontent.com/anchore/syft/63ab0acead6162a91f8e31fa6537f7bed8430e58/syft/format/spdxjson/testdata/spdx/alpine-3.10.syft.spdx.json",
+    "sha256": "e8629b5f446f094146f51816f286203302b62c1d387cde4125f9275d0f8ea81e"
+  },
+  {
+    "file": "syft-tag-value.spdx",
+    "repository": "anchore/syft",
+    "commit": "63ab0acead6162a91f8e31fa6537f7bed8430e58",
+    "path": "syft/format/spdxtagvalue/testdata/tag-value.spdx",
+    "url": "https://raw.githubusercontent.com/anchore/syft/63ab0acead6162a91f8e31fa6537f7bed8430e58/syft/format/spdxtagvalue/testdata/tag-value.spdx",
+    "sha256": "067f7e34f8d541bd344dd58b806e24b7fe910c912922f54ff5e4cd1ae740585d"
+  },
+  {
+    "file": "trivy-bom.json",
+    "repository": "aquasecurity/trivy",
+    "commit": "e526536331aed730985a3ac00539da189b7790f2",
+    "path": "pkg/sbom/spdx/testdata/happy/bom.json",
+    "url": "https://raw.githubusercontent.com/aquasecurity/trivy/e526536331aed730985a3ac00539da189b7790f2/pkg/sbom/spdx/testdata/happy/bom.json",
+    "sha256": "d1e1b555c7dc2c139655b143c0edf81b1eff6779396c02d353081bddbc8d4089"
+  },
+  {
+    "file": "trivy-no-relationship.json",
+    "repository": "aquasecurity/trivy",
+    "commit": "e526536331aed730985a3ac00539da189b7790f2",
+    "path": "pkg/sbom/spdx/testdata/happy/no-relationship.json",
+    "url": "https://raw.githubusercontent.com/aquasecurity/trivy/e526536331aed730985a3ac00539da189b7790f2/pkg/sbom/spdx/testdata/happy/no-relationship.json",
+    "sha256": "36fa1191da3c713513c00159868d9d588904e705ff1a5e241fd9fa0dd28d281f"
+  },
+  {
+    "file": "trivy-files.json",
+    "repository": "aquasecurity/trivy",
+    "commit": "e526536331aed730985a3ac00539da189b7790f2",
+    "path": "pkg/sbom/spdx/testdata/happy/with-files-in-relationships-bom.json",
+    "url": "https://raw.githubusercontent.com/aquasecurity/trivy/e526536331aed730985a3ac00539da189b7790f2/pkg/sbom/spdx/testdata/happy/with-files-in-relationships-bom.json",
+    "sha256": "c41a7f6ec2a2d389a78ea07253da359d7ad6525ce48232e6e1593c31793cd750"
+  },
+  {
+    "file": "trivy-empty.json",
+    "repository": "aquasecurity/trivy",
+    "commit": "e526536331aed730985a3ac00539da189b7790f2",
+    "path": "pkg/sbom/spdx/testdata/happy/empty-bom.json",
+    "url": "https://raw.githubusercontent.com/aquasecurity/trivy/e526536331aed730985a3ac00539da189b7790f2/pkg/sbom/spdx/testdata/happy/empty-bom.json",
+    "sha256": "803b82e147582ba10ef3c294b6ca16c73e04dc6075937b54c34d78ad6f280a2b"
+  },
+  {
+    "file": "tern-photon.json",
+    "repository": "tern-tools/tern",
+    "commit": "717ea47be7310d055b86fb1b80d39fb472c0ddbf",
+    "path": "docs/examples/photon-spdx.json",
+    "url": "https://raw.githubusercontent.com/tern-tools/tern/717ea47be7310d055b86fb1b80d39fb472c0ddbf/docs/examples/photon-spdx.json",
+    "sha256": "48072bfcb3464f58e3ec41ca5ded027f0b2e53ac0ae974b18b6dad44d6c9265c"
+  },
+  {
+    "file": "tern-photon.spdx",
+    "repository": "tern-tools/tern",
+    "commit": "717ea47be7310d055b86fb1b80d39fb472c0ddbf",
+    "path": "docs/examples/photon.spdx",
+    "url": "https://raw.githubusercontent.com/tern-tools/tern/717ea47be7310d055b86fb1b80d39fb472c0ddbf/docs/examples/photon.spdx",
+    "sha256": "278cf435c1efc852f4c7a478196c708e4714e854ff3d0c0c0095e9d24b68870a"
+  }
+]

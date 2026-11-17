@@ -26,7 +26,7 @@ or the [minimal inventory example](../public/examples/tiny-app.spdx.json).
 `packages` counts package records with distinct SPDX IDs, excluding the selected
 project root. Files and snippets are not packages. Different versions or records
 with different IDs remain separate, even when their names or PURLs match.
-Conflicting duplicate IDs are rejected instead of silently deduplicated.
+Conflicting duplicate IDs, including a document/package ID collision, are rejected instead of silently deduplicated.
 
 The document's single explicit described package is preselected using
 `documentDescribes`, `DESCRIBES` or `DESCRIBED_BY`. With multiple or no candidates,
@@ -78,7 +78,10 @@ and other. Missing or unfamiliar values are **Unspecified purpose**. A package
 called React is not automatically classified as a framework. Development tools
 are not a separate SPDX purpose: a tool may be an APPLICATION while its
 relationship is DEV_DEPENDENCY_OF. Older 2.2 documents often have no purpose
-field; their names still appear under the unspecified category.
+field. Since 0.5.0, when all package purposes are unknown and at least one PURL
+ecosystem is available, the first group uses recorded ecosystems instead. If
+neither purpose nor ecosystem information is available, names remain under the
+unspecified category. Partially known purposes keep the purpose-based grouping.
 
 Each package contributes to exactly one purpose parent. Representatives are
 grouped by displayed name and version, prioritize direct dependencies, then use
@@ -98,6 +101,11 @@ package in the selected root's graph.
 
 The parent groups still each add up to the full package count. Nested rows are
 already included in their parent; all percentages use the full inventory.
+The ecosystem fallback is explicitly identified in the label note and review; it
+does not infer language, framework or package purpose. It uses at most 20 ecosystem
+parents plus a grouped remainder and avoids repeating the ecosystem distribution
+at the bottom. Representative limits and full-inventory totals are unchanged.
+
 The label notes and import review disclose incomplete purposes, representative
 selection and overlapping subtypes. This is selective presentation, not full
 SPDX field coverage or SPDX conformance validation.
@@ -180,7 +188,8 @@ The interoperability review used the official
 and [Trivy sample](https://github.com/aquasecurity/trivy/blob/main/pkg/sbom/spdx/testdata/happy/bom.json),
 imported in the browser. These are sample-output checks, not a guarantee for every
 generator release or a claim that all generators were run locally. The committed
-unit fixtures and downloadable example are fictional, authored for Nibmark.
+original unit fixtures and downloadable examples are fictional, authored for Nibmark.
+The pinned upstream corpus added in 0.5.0 is described below.
 
 ## Specification audit
 
@@ -200,3 +209,33 @@ and [Tag/Value example](https://github.com/spdx/spdx-spec/blob/v2.3.1/examples/S
 were also imported through the browser: both produced four package records when
 no project root was excluded. These external sample checks were run separately
 from the committed fictional regression fixtures.
+
+## Upstream compatibility checks (0.5.0)
+
+Eight unchanged SPDX example/interoperability-test files from the official Syft,
+Trivy and Tern repositories are pinned by commit and SHA-256. The tests run offline;
+seven files are expected to import and export, while the third-party Elasticsearch
+fixture held by Trivy is expected to fail because its document ID equals a package
+ID. This is an ambiguity check, not a claim that the fixture is a Trivy-generated
+SBOM or that every producer/version is supported.
+
+See the [corpus inventory and provenance](../tests/fixtures/spdx/upstream/README.md).
+Container containment remains distinct from dependency edges. Files do not become
+packages; a root-only inventory becomes zero after that root is excluded. Selecting
+an application root follows only its recorded dependency edges, even when the
+surrounding container lists other applications.
+
+Some upstream examples are not fully conformant SPDX. Nibmark applies narrow,
+explicit recovery rules without rewriting the input:
+
+- An absent/blank document name uses “Untitled SBOM” (localized in Korean) unless a
+  package root is selected. The review and exported label disclose missing metadata.
+- A nonstandard but syntactically valid, unique document ID is retained so exact
+  relationship references still work. The review and label disclose the deviation.
+- Missing/invalid IDs, duplicate IDs and document/package ID collisions are rejected.
+- Unknown relationship types are not repaired heuristically. An explicit
+  documentDescribes entry can still establish a root independently.
+
+These rules support presentation of imperfect inputs; they do not certify SPDX
+conformance. The standard requires a document name and SPDXRef-DOCUMENT, as
+specified in [document creation information](https://spdx.github.io/spdx-spec/v2.3.1/document-creation-information/).

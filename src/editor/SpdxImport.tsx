@@ -22,7 +22,7 @@ const errors: Record<Locale, Record<ImportErrorCode, string>> = {
       'This document contains no package inventory. Choose an SPDX file with a packages section.',
     limit: 'Use at most 10,000 packages and 100,000 relationships per file.',
     duplicate:
-      'Duplicate SPDX IDs or repeated fields make the inventory ambiguous. Export a fresh file.',
+      'Duplicate document/package SPDX IDs or repeated fields make the inventory ambiguous. Export a fresh file.',
   },
   ko: {
     size: '5 MB 이하의 SPDX 파일을 선택하세요.',
@@ -33,7 +33,8 @@ const errors: Record<Locale, Record<ImportErrorCode, string>> = {
     invalid: '파일이 불완전하거나 목록 필드가 올바르지 않습니다. SPDX 파일을 다시 생성해 주세요.',
     packages: '패키지 목록이 없는 문서입니다. packages 영역이 있는 SPDX 파일을 선택하세요.',
     limit: '파일당 패키지 10,000개, 관계 100,000개까지 지원합니다.',
-    duplicate: 'SPDX ID 또는 필드가 중복되어 집계할 수 없습니다. 파일을 다시 생성해 주세요.',
+    duplicate:
+      '문서·패키지의 SPDX ID 또는 필드가 중복되어 집계할 수 없습니다. 파일을 다시 생성해 주세요.',
   },
 };
 export function SpdxImport({
@@ -136,6 +137,17 @@ export function SpdxImport({
               {errors[locale][shownError]}
             </p>
           )}
+          {doc?.warnings.map((warning) => (
+            <p className="spdx-note" key={warning}>
+              {warning === 'missing-document-name'
+                ? ko
+                  ? '원본에 문서 이름이 없습니다. 기준 프로젝트를 선택하지 않으면 임시 제목을 사용합니다.'
+                  : 'The source has no document name. A placeholder title is used unless you select a project root.'
+                : ko
+                  ? '문서 ID가 표준 SPDXRef-DOCUMENT와 다릅니다. 원본 ID를 유지하며 해석합니다.'
+                  : 'The document uses a nonstandard ID instead of SPDXRef-DOCUMENT. Its original ID is preserved.'}
+            </p>
+          ))}
           {doc && (
             <>
               <label className="spdx-field">
@@ -186,9 +198,16 @@ export function SpdxImport({
               </p>
               <p className="spdx-note">
                 {ko
-                  ? `용도별 대표 항목 ${summary.representativeCount}개를 표시합니다. 용도 미확인 패키지: ${summary.unknownPurpose}개. 관계 하위 항목은 중복될 수 있으며 실행·개발 범위를 상속하지 않습니다.`
-                  : `Showing ${summary.representativeCount} representative entries by recorded purpose. Packages without a known purpose: ${summary.unknownPurpose}. Edge subtypes may overlap; runtime/development scopes are not inherited.`}
+                  ? `대표 항목 ${summary.representativeCount}개를 표시합니다. 용도 미확인 패키지: ${summary.unknownPurpose}개. 관계 하위 항목은 중복될 수 있으며 실행·개발 범위를 상속하지 않습니다.`
+                  : `Showing ${summary.representativeCount} representative entries. Packages without a known purpose: ${summary.unknownPurpose}. Edge subtypes may overlap; runtime/development scopes are not inherited.`}
               </p>
+              {summary.compositionBasis === 'ecosystem' && (
+                <p className="spdx-note">
+                  {ko
+                    ? '용도 정보가 없어 기록된 PURL 생태계별로 구성했습니다. 생태계로 프로그램 언어나 용도를 추정하지 않습니다.'
+                    : 'No purpose data: composition uses recorded PURL ecosystems. These do not establish the program’s language or purpose.'}
+                </p>
+              )}
               {summary.unresolved > 0 && (
                 <p>
                   {ko

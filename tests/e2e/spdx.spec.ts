@@ -97,3 +97,32 @@ test('Pantry API import explains project identity and nests representative ingre
     await page.screenshot({ path: 'docs/assets/pantry-playground.png', fullPage: false });
   }
 });
+
+for (const [file, count] of [
+  ['syft-alpine.json', 3],
+  ['syft-tag-value.spdx', 4],
+  ['trivy-bom.json', 11],
+  ['trivy-files.json', 2],
+  ['trivy-empty.json', 0],
+  ['tern-photon.json', 37],
+  ['tern-photon.spdx', 37],
+] as const) {
+  test(`upstream ${file} imports and exports a readable PNG`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && m.text().includes('attribute d')) errors.push(m.text());
+    });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Import SPDX', exact: true }).click();
+    await page.getByLabel('Choose SPDX file').setInputFiles('tests/fixtures/spdx/upstream/' + file);
+    if (file === 'syft-tag-value.spdx')
+      await expect(page.getByRole('dialog')).toContainText('The source has no document name.');
+    await page.getByRole('button', { name: 'Create label', exact: true }).click();
+    await expect(page.locator('#nibmark-desc')).toContainText('Packages: ' + count + '.');
+    const pending = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download PNG', exact: true }).click();
+    expect(await (await pending).failure()).toBeNull();
+    expect(errors).toEqual([]);
+  });
+}

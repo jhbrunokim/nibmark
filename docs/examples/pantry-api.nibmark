@@ -38,4 +38,4 @@ group "Declared licenses" of packages
 group "Package ecosystems" of packages
   item "npm" 24
 
-note "Selected package names shown. Purposes and edges come from the SBOM and may be incomplete. Edge subtypes can overlap; runtime scope is not inferred."
+note "Purposes follow SBOM records. Selected names only. Edges may be incomplete or overlap; runtime scope is not inferred."
