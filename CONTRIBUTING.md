@@ -42,3 +42,15 @@ Keep the round scoped to the next roadmap milestone and merge only after its che
 After merging, verify the branch tip matches the merged PR head, remove the remote and
 local topic branches, and update local `main`. Do not reuse merged branches or delete
 branches containing additional unmerged work.
+
+## Packaged Codex skill
+
+The distributable skill lives in `skills/nibmark`. Keep its references consistent
+with supported parser/importer behavior. Do not add machine-specific paths or
+promise headless image export: images currently use the browser playground.
+
+`npm test` also checks the skill's example and Python edit-link helper against the
+application's parser/share protocol. Python 3.9+ must be available as `python3`;
+the helper uses only the standard library. A GitHub installation should copy the
+entire skill directory, including its MIT license. Test installer changes in a
+fresh temporary destination instead of replacing a user's installed skill.

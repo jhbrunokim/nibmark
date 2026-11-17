@@ -10,9 +10,9 @@
 
 Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Import an existing SBOM or describe the ingredients; Nibmark handles the typography, layout, and percentages.
 
-[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
+[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Install the skill](#install-the-codex-skill) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.7.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.8.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/pantry-api.svg" alt="Software Facts for Pantry API: 24 packages, with Fastify nested under Frameworks and PostgreSQL/Redis clients under Libraries. Fictional SPDX data." width="360">
 
@@ -42,6 +42,39 @@ Open the Local URL printed by Vite. Use the **Example** picker to compare seven 
 4. Copy the Markdown snippet into your README.
 
 The project being described can use any language or framework. Only people developing or self-hosting Nibmark need Node.js; users of a hosted editor will only need a browser.
+
+## Install the Codex skill
+
+Ask Codex to install the public [Nibmark skill](skills/nibmark/SKILL.md):
+
+```text
+$skill-installer Install https://github.com/jhbrunokim/nibmark/tree/main/skills/nibmark
+```
+
+The skill is available on the next turn. Then ask:
+
+```text
+$nibmark Turn ./sbom.spdx.json into a compact Software Facts label for my README.
+```
+
+Or: `$nibmark 이 SPDX 파일로 한국어 README용 성분표를 만들어줘.`
+
+The skill supports existing SPDX 2.2/2.3 JSON or Tag/Value, existing `.nibmark`
+recipes, and composition data you provide. It uses the real Nibmark playground
+for SVG/PNG export. Browser tools with upload/download support are needed for
+image export; without them it can provide a recipe and an edit link. The optional
+link helper needs Python 3.9+ with no third-party packages. The skill does not
+scan projects, generate SBOMs or check vulnerabilities.
+
+For manual installation, clone this repository and copy the `skills/nibmark`
+directory to `$CODEX_HOME/skills/nibmark` (default `~/.codex/skills/nibmark`).
+Keep its `agents`, `references`, `scripts` and `LICENSE` files together. Review
+any existing installation before replacing it. For a fixed version, check out
+the `v0.8.0` tag before copying; the `main` installation link follows future updates
+when you reinstall. Installed copies do not update automatically.
+
+The skill is MIT licensed. See [the skill instructions](skills/nibmark/SKILL.md)
+for its workflow and [contributing](CONTRIBUTING.md) for development checks.
 
 ## Example
 
