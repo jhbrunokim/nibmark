@@ -12,9 +12,13 @@ const copy = {
   en: {
     tagline: 'Give your project a nutrition label.',
     example: 'Example',
-    classic: 'Classic',
+    classic: 'Basic · dependencies',
+    api: 'API · Node.js',
+    web: 'Web · React',
+    python: 'Data · Python',
+    container: 'Container · Linux',
     korean: 'Korean',
-    zero: 'Zero dependencies',
+    zero: 'Static site · zero dependencies',
     custom: 'Your recipe',
     source: 'The recipe',
     preview: 'The label',
@@ -62,9 +66,13 @@ const copy = {
   ko: {
     tagline: '내 프로젝트를 위한 소프트웨어 성분표.',
     example: '예제',
-    classic: '기본',
+    classic: '기본 · 의존성',
+    api: 'API · Node.js',
+    web: '웹 앱 · React',
+    python: '데이터 도구 · Python',
+    container: '컨테이너 · Linux',
     korean: '한국어',
-    zero: '의존성 없음',
+    zero: '정적 사이트 · 의존성 없음',
     custom: '나만의 레시피',
     source: '레시피',
     preview: '성분표',
@@ -375,9 +383,11 @@ export function App() {
                 <option value="custom" disabled>
                   {c.custom}
                 </option>
-                <option value="classic">{c.classic}</option>
-                <option value="korean">{c.korean}</option>
-                <option value="zero">{c.zero}</option>
+                {(Object.keys(examples) as ExampleName[]).map((name) => (
+                  <option key={name} value={name}>
+                    {c[name]}
+                  </option>
+                ))}
               </select>
             </label>
             <div className="locale-switch" role="group" aria-label="Language">

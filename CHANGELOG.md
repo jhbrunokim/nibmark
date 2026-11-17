@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 — 2026-11-17
+
+- Choose and pin representative package names during SPDX import without changing inventory counts or percentages; search by name, version or SPDX ID.
+- Select visible relationship, license and ecosystem sections; retain the main composition and disclose hidden sections.
+- Freeze choices into the generated Nibmark recipe for source saving, edit links and image exports. New SBOM files reset choices; selecting a pinned package as root removes that pin.
+- Expand the example picker to seven varied recipes including a Node.js API, React web app, Python data tool and Linux container.
+
 ## 0.5.0 — 2026-11-17
 
 - Add eight pinned Syft, Trivy and Tern upstream SPDX example/test files with source URLs, commit hashes and SHA-256 checks; seven import/export and one remains an explicit ambiguity rejection.

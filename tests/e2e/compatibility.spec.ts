@@ -120,3 +120,27 @@ test('upstream metadata gaps are explained and ambiguous identities do not repla
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({ path: testInfo.outputPath('upstream-fallback.png'), fullPage: true });
 });
+
+test('manual pins and section choices work on a Korean mobile screen', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: '한국어', exact: true }).click();
+  await page.getByRole('button', { name: 'SPDX 가져오기', exact: true }).click();
+  await page.getByLabel('SPDX 파일 선택').setInputFiles('public/examples/pantry-api.spdx.json');
+  await page.getByText('대표 성분과 표시 영역 선택', { exact: true }).click();
+  await page.getByLabel('대표 성분 선택 방식').selectOption('manual');
+  await page.getByLabel('패키지 검색').fill('library-20');
+  await page.getByRole('checkbox', { name: /library-20 @/ }).check();
+  await page.getByRole('checkbox', { name: '라이선스', exact: true }).uncheck();
+  await page
+    .locator('.import-presentation')
+    .screenshot({ path: testInfo.outputPath('ingredient-picker.png') });
+  await page.getByRole('button', { name: '성분표 만들기', exact: true }).click();
+  await expect(page.locator('#nibmark-desc')).toContainText('library-20 @ 1.0.0');
+  await expect(page.locator('#nibmark-desc')).not.toContainText('선언된 라이선스');
+  await expect(page.locator('#nibmark-desc')).toContainText('패키지: 24');
+  await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});

@@ -654,6 +654,16 @@ footer {
   }
   .select-label {
     gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+  .select-label select {
+    min-width: 0;
+    width: 0;
+    flex: 1;
+  }
+  .locale-switch {
+    flex-shrink: 0;
   }
   .locale-switch {
     padding-left: 8px;
@@ -803,4 +813,65 @@ footer {
 }
 .spdx-dialog .export-buttons {
   margin-bottom: 12px;
+}
+
+.import-presentation {
+  border-block: 1px solid var(--border);
+  padding: 14px 0;
+}
+.ingredient-options {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  padding: 8px;
+}
+.ingredient-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.ingredient-option input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  accent-color: var(--ink);
+}
+.ingredient-option span,
+.pinned-ingredients span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ingredient-option small,
+.pinned-ingredients small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+.pinned-ingredients {
+  padding: 0;
+  list-style: none;
+}
+.pinned-ingredients li {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.pinned-ingredients button {
+  flex-shrink: 0;
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  padding: 5px 8px;
+}
+.section-options {
+  min-width: 0;
+  border: 1px solid var(--border);
+  padding: 12px;
+  margin-top: 16px;
+}
+.section-options legend {
+  font-weight: 700;
+  padding: 0 5px;
 }

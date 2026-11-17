@@ -96,3 +96,11 @@ code blocks natively.
 Invalid input preserves the previous preview, visibly marked as stale, while
 image export is disabled. Saving the source remains available. Opening a file
 switching examples or applying an SPDX import can be undone with Undo replacement.
+
+## Import presentation choices
+
+The SPDX importer can generate only selected representative names and optional
+sections. These choices become ordinary groups and includes rows, so no new DSL
+keyword is required. The main composition still sums to the full inventory count.
+Saving/sharing the recipe preserves the rendered selection, not the original SBOM
+or a reusable selection configuration. See [import presentation](spdx-import.md#choose-and-pin-ingredients-060).

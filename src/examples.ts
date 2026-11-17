@@ -44,5 +44,120 @@ group "Dependency composition" of dependencies
 
 note "Zero dependencies. All homemade."
 `,
+  api: `nutrition v1
+project "Pantry API" version "1.4.0"
+serving "1 SBOM"
+scope "SBOM package inventory · all scopes"
+source "SPDX-2.3 (JSON)"
+description "Node.js REST API · PostgreSQL / Redis"
+supplier "Organization: Pantry Example"
+generator "Nibmark fictional example"
+created "2026-11-16T00:00:00Z"
+packages 24
+
+group "Composition" of packages
+  item "Frameworks" 1
+    includes "fastify @ 1.0.0" 1
+  item "Libraries" 19
+    includes "ioredis @ 1.0.0" 1
+    includes "pg @ 1.0.0" 1
+    includes "pino @ 1.0.0" 1
+  item "Applications" 4
+    includes "typescript @ 1.0.0" 1
+    includes "vitest @ 1.0.0" 1
+    includes "build-helper @ 1.0.0" 1
+
+group "Recorded relationships" of packages
+  item "Direct" 6
+    includes "Runtime edge" 4
+    includes "Development edge" 2
+  item "Transitive" 18
+    includes "Runtime edge" 16
+    includes "Development edge" 2
+  item "Unclassified" 0
+
+group "Declared licenses" of packages
+  item "MIT" 20
+  item "Apache-2.0" 3
+  item "NOASSERTION" 1
+
+group "Package ecosystems" of packages
+  item "npm" 24
+
+note "Purposes follow SBOM records. Selected names only. Edges may be incomplete or overlap; runtime scope is not inferred."
+`,
+  web: `nutrition v1
+project "Canvas Web" version "2.1.0"
+description "Interactive browser app built with React and Vite"
+serving "1 project"
+scope "Application and build packages · fictional example"
+packages 16
+
+group "Composition" of packages
+  item "UI libraries" 6
+    includes "React" 1
+    includes "React DOM" 1
+  item "Build tools" 4
+    includes "Vite" 1
+    includes "TypeScript" 1
+  item "Other libraries" 6
+
+group "Declared licenses" of packages
+  item "MIT" 14
+  item "Apache-2.0" 2
+
+note "Fictional composition for trying Nibmark. Included names are examples within each parent, not an exhaustive list."
+`,
+  python: `nutrition v1
+project "Field Notes" version "0.8.0"
+description "Python data pipeline for collecting and analyzing tables"
+serving "1 environment"
+scope "Data, numerical and command-line packages · fictional example"
+packages 18
+
+group "Composition" of packages
+  item "Data processing" 6
+    includes "pandas" 1
+    includes "PyArrow" 1
+  item "Numerical computing" 4
+    includes "NumPy" 1
+    includes "SciPy" 1
+  item "CLI and helpers" 8
+    includes "Click" 1
+
+group "Declared licenses" of packages
+  item "BSD-3-Clause" 12
+  item "Apache-2.0" 4
+  item "MIT" 2
+
+group "Package ecosystems" of packages
+  item "PyPI" 18
+
+note "Fictional data-tool recipe. These illustrative package counts and licenses do not describe a real release."
+`,
+  container: `nutrition v1
+project "Edge Container" version "3.0.0"
+description "Small Linux container serving static assets with nginx"
+serving "1 container image"
+scope "Image inventory · fictional example"
+packages 24
+
+group "Composition" of packages
+  item "Operating system packages" 22
+    includes "BusyBox" 1
+    includes "OpenSSL" 1
+    includes "curl" 1
+  item "Application packages" 2
+    includes "nginx" 1
+    includes "entrypoint scripts" 1
+
+group "Declared licenses" of packages
+  item "GPL-2.0-only" 12
+  item "BSD-2-Clause" 4
+  item "MIT" 6
+  item "NOASSERTION" 2
+
+note "Fictional container inventory. Being included in an image does not establish a runtime dependency relationship."
+`,
 };
 export type ExampleName = keyof typeof examples;
