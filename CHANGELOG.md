@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 — 2026-11-17
+
+- Make the skill distribution explicitly host-neutral, with Codex, Claude Code, Claude web and other Agent Skills client installation guidance.
+- Publish a reproducible skill-only ZIP with references, helper and MIT license for upload-based clients.
+- Add an Agent Skills installation badge as the sole README installation link, consolidate the playground entry point, and keep only future options in the roadmap.
+- Validate packaged files and edit-link behavior after extracting the distributable archive.
+
 ## 0.8.0 — 2026-11-17
 
 - Publish the MIT-licensed Nibmark Codex skill at `skills/nibmark`, installable from this public GitHub repository.

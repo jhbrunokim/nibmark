@@ -4,15 +4,15 @@
 [![CI](https://github.com/jhbrunokim/nibmark/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jhbrunokim/nibmark/actions/workflows/ci.yml)
 [![Pages](https://github.com/jhbrunokim/nibmark/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/jhbrunokim/nibmark/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Try the playground](https://img.shields.io/badge/demo-playground-black)](https://jhbrunokim.github.io/nibmark/)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-install-7C3AED)](docs/install.md)
 
 **Give your project a nutrition label.**
 
 Nibmark turns a small text definition into a familiar, black-and-white **Software Facts** label for your README. Import an existing SBOM or describe the ingredients; Nibmark handles the typography, layout, and percentages.
 
-[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Install the skill](#install-the-codex-skill) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
+[Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.8.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.9.0** — Browser editor and portable Agent Skill. No published npm package yet.
 
 <img src="docs/assets/pantry-api.svg" alt="Software Facts for Pantry API: 24 packages, with Fastify nested under Frameworks and PostgreSQL/Redis clients under Libraries. Fictional SPDX data." width="360">
 
@@ -25,56 +25,14 @@ the choice is saved in the recipe and edit link. Use EN / 한국어 independentl
 
 ## Get started
 
-Use Node.js 24.16+ and npm:
-
-```sh
-git clone https://github.com/jhbrunokim/nibmark.git
-cd nibmark
-npm ci
-npm run dev
-```
-
-Open the Local URL printed by Vite. Use the **Example** picker to compare seven editable recipes and their rendered labels.
+In the playground, use the **Example** picker to compare seven editable recipes.
 
 1. Change the project name and ingredient counts.
 2. Download SVG or PNG.
 3. Add the image to your repository.
 4. Copy the Markdown snippet into your README.
 
-The project being described can use any language or framework. Only people developing or self-hosting Nibmark need Node.js; users of a hosted editor will only need a browser.
-
-## Install the Codex skill
-
-Ask Codex to install the public [Nibmark skill](skills/nibmark/SKILL.md):
-
-```text
-$skill-installer Install https://github.com/jhbrunokim/nibmark/tree/main/skills/nibmark
-```
-
-The skill is available on the next turn. Then ask:
-
-```text
-$nibmark Turn ./sbom.spdx.json into a compact Software Facts label for my README.
-```
-
-Or: `$nibmark 이 SPDX 파일로 한국어 README용 성분표를 만들어줘.`
-
-The skill supports existing SPDX 2.2/2.3 JSON or Tag/Value, existing `.nibmark`
-recipes, and composition data you provide. It uses the real Nibmark playground
-for SVG/PNG export. Browser tools with upload/download support are needed for
-image export; without them it can provide a recipe and an edit link. The optional
-link helper needs Python 3.9+ with no third-party packages. The skill does not
-scan projects, generate SBOMs or check vulnerabilities.
-
-For manual installation, clone this repository and copy the `skills/nibmark`
-directory to `$CODEX_HOME/skills/nibmark` (default `~/.codex/skills/nibmark`).
-Keep its `agents`, `references`, `scripts` and `LICENSE` files together. Review
-any existing installation before replacing it. For a fixed version, check out
-the `v0.8.0` tag before copying; the `main` installation link follows future updates
-when you reinstall. Installed copies do not update automatically.
-
-The skill is MIT licensed. See [the skill instructions](skills/nibmark/SKILL.md)
-for its workflow and [contributing](CONTRIBUTING.md) for development checks.
+The project being described can use any language or framework.
 
 ## Example
 
@@ -252,27 +210,12 @@ import that fictional example. See the [field mapping and selection rules](docs/
 
 ## Roadmap
 
-Completed foundations: label/browser work (0.2.0), SPDX 2.x import (0.3.0),
-and hierarchical ingredients (0.4.0).
-
-Required rounds, one at a time:
-
-1. Real SBOM compatibility and missing-data presentation — completed in 0.5.0.
-2. Select and pin representative ingredients and choose displayed sections — completed in 0.6.0.
-3. Compact and detailed compositions within the same nutrition-label design — completed in 0.7.0.
-
-Optional backlog (not scheduled as required rounds):
+Potential extensions (optional, not scheduled):
 
 - SPDX 3.x JSON-LD and CycloneDX adapters.
 - CLI conversion, GitHub Actions automation and Markdown renderer integrations.
 
-Product direction: make existing generators' results easy to read and share.
-Building another SBOM generator or repository analyzer is outside the roadmap.
-
-See [versioning](VERSIONING.md) and [changes](CHANGELOG.md) for release tracking.
-
-The [original design](design/software-facts-v0.1.md) records the product decisions;
-the [syntax guide](docs/syntax.md) describes the implemented behavior.
+Nibmark focuses on presenting existing SBOMs, not generating them.
 
 ## Inspiration
 
