@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0 — 2026-11-16
+## 0.5.0 — 2026-11-17
 
 - Add eight pinned Syft, Trivy and Tern upstream SPDX example/test files with source URLs, commit hashes and SHA-256 checks; seven import/export and one remains an explicit ambiguity rejection.
 - Fall back to recorded PURL ecosystems when every package lacks a recognized purpose, preserving nested names and totals without guessing a program's language or purpose.
