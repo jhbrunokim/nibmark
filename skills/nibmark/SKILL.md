@@ -1,6 +1,7 @@
 ---
 name: nibmark
 description: Create or edit Nibmark software nutrition labels from existing SPDX SBOMs or user-provided composition data, and prepare SVG/PNG and README embeds. Use for Nibmark recipes and software ingredient labels, not SBOM generation or vulnerability scanning.
+license: MIT
 ---
 
 # Nibmark
@@ -8,9 +9,11 @@ description: Create or edit Nibmark software nutrition labels from existing SPDX
 Create a familiar black-and-white Software Facts label using the actual Nibmark renderer.
 Playground: https://jhbrunokim.github.io/nibmark/
 Source: https://github.com/jhbrunokim/nibmark
-This skill targets Nibmark 0.8.0 / `nutrition v1`.
+This skill targets Nibmark 0.9.0 / `nutrition v1`.
 
 Requires an agent that can read/write files. Image export additionally requires browser tools with file upload/download support; the optional edit-link helper requires Python 3.9+ and no third-party packages. Resolve supporting paths relative to this installed skill directory.
+
+This is a portable Agent Skill. The workflow is independent of the host AI; use the host's available filesystem, shell and browser tools. `agents/openai.yaml` contains optional Codex UI metadata only, not a required runtime dependency. No host-specific tool names, permission bypasses or environment-variable substitutions are required.
 
 ## Choose the input path
 
@@ -38,7 +41,7 @@ python3 <skill-directory>/scripts/edit_link.py path/to/project.nibmark --locale 
 
 The helper only encodes the recipe; it does not validate grammar or render images. Links contain the full recipe in their fragment. For overly long recipes use the source file instead.
 
-Before claiming completion, confirm the editor accepted the current source, inspect the rendered label, and verify requested downloads exist. Inspect compact output for an explicit summary note and retained totals, scope, warnings and provenance. Export controls are disabled while the preview is stale or invalid.
+For rendered deliverables, confirm the editor accepted the current source, inspect the rendered label, and verify requested downloads exist. When only a recipe/link can be delivered, clearly state that rendering was not verified. Inspect compact output for an explicit summary note and retained totals, scope, warnings and provenance. Export controls are disabled while the preview is stale or invalid.
 
 Deliver the `.nibmark`, requested image(s), and an image Markdown snippet using the actual intended repository-relative image path. GitHub does not render `nibmark` fences natively. Edit the user's README when requested; preserve unrelated content. Creating labels does not itself authorize committing, pushing, publishing, or changing the user's repository workflow.
 

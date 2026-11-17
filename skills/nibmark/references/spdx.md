@@ -2,7 +2,7 @@
 
 Use Nibmark's importer rather than reconstructing its inventory rules.
 
-1. Open Import SPDX and choose an existing SPDX 2.2/2.3 JSON or Tag/Value file. Limits: 5 MB, 10,000 packages, 100,000 relationships. SPDX 3.x, CycloneDX and generator-native JSON are not supported in 0.8.0.
+1. Open Import SPDX and choose an existing SPDX 2.2/2.3 JSON or Tag/Value file. Limits: 5 MB, 10,000 packages, 100,000 relationships. SPDX 3.x, CycloneDX and generator-native JSON are not supported in 0.9.0.
 2. Review root, warnings and inventory totals before applying. One explicit described package can be preselected; ambiguous roots require a choice or explicit count-all behavior. Ask when the user's intended project root cannot be established.
 3. Optionally open Choose ingredients and sections, pin up to 12 representative package records and select relationship/license/ecosystem sections. Automatic representatives are deterministic, not a ranking of importance.
 4. Create label, then choose compact/detailed in the main editor. Inspect and export through the existing renderer.
