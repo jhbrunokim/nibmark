@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 — 2026-11-17
+
+- Publish the MIT-licensed Nibmark Codex skill at `skills/nibmark`, installable from this public GitHub repository.
+- Bundle syntax/SPDX workflow references and a dependency-free Python edit-link helper.
+- Document installer and manual setup, supported inputs, browser requirements and update behavior.
+- Check the skill example and Python helper against the application's parser and share-link protocol.
+
 ## 0.7.0 — 2026-11-17
 
 - Add `view compact` / `view detailed` and a bilingual view picker; saved recipes, edit links and exports retain the choice without removing source ingredients.

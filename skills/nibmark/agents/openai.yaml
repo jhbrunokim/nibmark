@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nibmark"
+  short_description: "Turn existing SBOMs into software nutrition labels"
+  default_prompt: "Use $nibmark to turn my existing SPDX SBOM into a README-ready software nutrition label."
