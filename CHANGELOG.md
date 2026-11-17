@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 — 2026-11-17
+
+- Add `view compact` / `view detailed` and a bilingual view picker; saved recipes, edit links and exports retain the choice without removing source ingredients.
+- Compact labels show the first group and one included ingredient per item, preserving totals, warnings and provenance with an explicit summary note.
+- Replace the Korean picker entry with a Rust CLI example; preserve the selected UI language when changing examples.
+- Add version, CI, Pages, MIT and playground badges to the README.
+
 ## 0.6.0 — 2026-11-17
 
 - Choose and pin representative package names during SPDX import without changing inventory counts or percentages; search by name, version or SPDX ID.

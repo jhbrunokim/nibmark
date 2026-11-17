@@ -172,6 +172,13 @@ export function parse(source: string): ParseResult {
           }
           phase = 1;
           break;
+        case 'view':
+          if (phase !== 1) fail(line, 1, 'Put view after project and before the count.');
+          check(2);
+          if (tokens[1]?.quoted || !['compact', 'detailed'].includes(tokens[1]?.value))
+            fail(line, tokens[1]?.column ?? 1, 'Use view compact or view detailed.');
+          model.view = tokens[1].value as 'compact' | 'detailed';
+          break;
         case 'serving':
         case 'scope':
         case 'description':

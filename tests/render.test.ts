@@ -92,3 +92,30 @@ describe('portable label rendering', () => {
     );
   });
 });
+
+it('compact summarizes visible rows without changing totals, notes, provenance or the model', () => {
+  const original = model(examples.api);
+  const compactModel = { ...original, view: 'compact' as const };
+  const before = JSON.stringify(compactModel);
+  const detailed = render(original, fonts);
+  const compact = render(compactModel, fonts);
+  expect(compact.height).toBeLessThan(detailed.height);
+  expect(compact.description).toContain('Packages: 24');
+  expect(compact.description).toContain('Libraries: 19 (79%)');
+  expect(compact.description).toContain('ioredis');
+  expect(compact.description).not.toContain('Includes pg');
+  expect(compact.description).not.toContain('Declared licenses');
+  expect(compact.description).toContain(original.note);
+  expect(compact.description).toContain(original.source);
+  expect(compact.description).toContain(original.created);
+  expect(compact.description).toContain('Compact view:');
+  expect(JSON.stringify(compactModel)).toBe(before);
+  expect(render({ ...original, view: 'detailed' }, fonts)).toEqual(detailed);
+});
+it('compact renders all examples and Korean summary wording, including zero totals', () => {
+  for (const source of Object.values(examples)) {
+    const output = render({ ...model(source), view: 'compact' }, fonts, 'ko');
+    expect(output.description).toContain('간략형:');
+    expect(output.svg).not.toContain('NaN');
+  }
+});

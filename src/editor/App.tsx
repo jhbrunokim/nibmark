@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MAX_BYTES, parse, type LabelModel, type Locale } from '../core';
-import { examples, type ExampleName } from '../examples';
+import { examples, exampleNames, type ExampleName } from '../examples';
 import { loadFonts } from '../renderer/fonts';
 import { render, type RenderedLabel } from '../renderer/render';
 import { download, filename, markdown, png } from './exports';
 import { readShare, shareURL, ShareError } from './share';
 import { version } from '../../package.json';
+import { setView } from '../core/view';
 import { SpdxImport } from './SpdxImport';
 
 const copy = {
@@ -18,6 +19,7 @@ const copy = {
     python: 'Data · Python',
     container: 'Container · Linux',
     korean: 'Korean',
+    rust: 'CLI · Rust',
     zero: 'Static site · zero dependencies',
     custom: 'Your recipe',
     source: 'The recipe',
@@ -72,6 +74,7 @@ const copy = {
     python: '데이터 도구 · Python',
     container: '컨테이너 · Linux',
     korean: '한국어',
+    rust: 'CLI · Rust',
     zero: '정적 사이트 · 의존성 없음',
     custom: '나만의 레시피',
     source: '레시피',
@@ -194,8 +197,7 @@ export function App() {
   const dialog = useRef<HTMLDialogElement>(null);
   const parsed = useMemo(() => parse(source), [source]);
   const c = copy[locale];
-  const exampleName =
-    (Object.keys(examples) as ExampleName[]).find((key) => examples[key] === source) ?? 'custom';
+  const exampleName = exampleNames.find((key) => examples[key] === source) ?? 'custom';
   const ready = parsed.ok && last?.source === source && last.locale === locale && !renderError;
   useEffect(() => {
     let active = true;
@@ -377,13 +379,13 @@ export function App() {
                 value={exampleName}
                 onChange={(e) => {
                   const name = e.target.value as ExampleName;
-                  replace(examples[name], name === 'korean' ? 'ko' : 'en');
+                  replace(examples[name]);
                 }}
               >
                 <option value="custom" disabled>
                   {c.custom}
                 </option>
-                {(Object.keys(examples) as ExampleName[]).map((name) => (
+                {exampleNames.map((name) => (
                   <option key={name} value={name}>
                     {c[name]}
                   </option>
@@ -524,6 +526,29 @@ export function App() {
                 {ready ? c.ready : !parsed.ok || renderError ? c.invalid : c.waiting}
               </span>
             </div>
+            <div className="view-controls">
+              <label>
+                {locale === 'ko' ? '라벨 보기' : 'Label view'}
+                <select
+                  aria-label={locale === 'ko' ? '라벨 보기' : 'Label view'}
+                  value={
+                    parsed.ok ? (parsed.model.view ?? 'detailed') : (last?.model.view ?? 'detailed')
+                  }
+                  disabled={!parsed.ok}
+                  onChange={(e) =>
+                    replace(setView(source, e.target.value as 'compact' | 'detailed'))
+                  }
+                >
+                  <option value="detailed">{locale === 'ko' ? '상세형' : 'Detailed'}</option>
+                  <option value="compact">{locale === 'ko' ? '간략형' : 'Compact'}</option>
+                </select>
+              </label>
+              <p>
+                {locale === 'ko'
+                  ? '간략형은 첫 그룹과 항목별 대표 성분 1개를 표시합니다. 원본 데이터는 유지됩니다.'
+                  : 'Compact shows the first group and one included ingredient per item. Your recipe keeps every ingredient.'}
+              </p>
+            </div>
             <div className="preview-stage">
               {last ? (
                 <>
@@ -624,6 +649,12 @@ export function App() {
               {locale === 'ko'
                 ? '프로젝트 이름과 선택적인 버전입니다.'
                 : 'Your project name and optional version.'}
+            </dd>
+            <dt>view compact / view detailed</dt>
+            <dd>
+              {locale === 'ko'
+                ? 'project 다음에 적습니다. 기본값은 상세형입니다. 간략형도 전체 수치, 각주와 출처를 유지합니다.'
+                : 'Place after project. Detailed is the default. Compact keeps totals, notes and provenance.'}
             </dd>
             <dt>dependencies 42</dt>
             <dd>

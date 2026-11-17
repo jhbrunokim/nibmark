@@ -875,3 +875,24 @@ footer {
   font-weight: 700;
   padding: 0 5px;
 }
+
+.view-controls {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line, #ddd);
+}
+.view-controls label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.view-controls select {
+  padding: 5px 8px;
+  font: inherit;
+}
+.view-controls p {
+  margin: 7px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666;
+}

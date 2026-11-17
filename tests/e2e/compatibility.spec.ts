@@ -144,3 +144,23 @@ test('manual pins and section choices work on a Korean mobile screen', async ({
   await expect(page.getByRole('button', { name: 'SVG 다운로드', exact: true })).toBeEnabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+test('compact view works on a narrow Korean screen and restores detailed ingredients', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/');
+  await page.getByLabel('Example', { exact: true }).selectOption('api');
+  await page.getByRole('button', { name: '한국어', exact: true }).click();
+  await page.getByLabel('라벨 보기', { exact: true }).selectOption('compact');
+  await expect(page.locator('#nibmark-desc')).toContainText('간략형:');
+  await expect(page.locator('#nibmark-desc')).not.toContainText('Declared licenses');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page
+    .getByTestId('label-preview')
+    .screenshot({ path: testInfo.outputPath('compact-korean.png') });
+  await page.getByLabel('라벨 보기', { exact: true }).selectOption('detailed');
+  await expect(page.locator('#nibmark-desc')).toContainText('Declared licenses');
+});

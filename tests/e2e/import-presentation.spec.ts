@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { examples } from '../../src/examples';
+import { examples, exampleNames } from '../../src/examples';
 
 test('pinned names and sections survive apply, undo, source round trip and edit links', async ({
   page,
@@ -86,12 +86,13 @@ test('the example picker offers seven distinct working recipes and supports undo
 }) => {
   await page.goto('/');
   await expect(page.locator('.select-label select option:not([disabled])')).toHaveCount(7);
-  for (const [key, source] of Object.entries(examples)) {
+  for (const key of exampleNames) {
+    const source = examples[key];
     await page.locator('.select-label select').selectOption(key);
     await expect(page.locator('.source-pane textarea')).toHaveValue(source);
     await expect(
       page.getByRole('button', {
-        name: key === 'korean' ? 'SVG 다운로드' : 'Download SVG',
+        name: 'Download SVG',
         exact: true,
       }),
     ).toBeEnabled();

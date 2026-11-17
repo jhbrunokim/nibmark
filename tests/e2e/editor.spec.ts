@@ -1,3 +1,4 @@
+import { examples } from '../../src/examples';
 import { test, expect } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
@@ -71,7 +72,8 @@ test('edit, recover from errors, export SVG/PNG and reopen a saved recipe', asyn
 
 test('Korean label, guide, mobile layout and invalid file handling', async ({ page }) => {
   await page.goto('/');
-  await page.getByLabel('Example', { exact: true }).selectOption('korean');
+  await page.getByRole('textbox', { name: 'Nibmark source' }).fill(examples.korean);
+  await page.getByRole('button', { name: '한국어', exact: true }).click();
   await expect(page.getByRole('button', { name: 'SVG 다운로드' })).toBeEnabled();
   await expect(page.locator('#nibmark-desc')).toContainText('소프트웨어 성분표');
   await expect(page.getByTestId('label-preview')).toHaveScreenshot('korean-label.png', {
