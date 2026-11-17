@@ -4,7 +4,7 @@ export const MAX_SPDX_BYTES = 5 * 1024 * 1024;
 const MAX_PACKAGES = 10_000;
 const MAX_RELATIONSHIPS = 100_000;
 export type ImportErrorCode =
-  'size' | 'format' | 'version' | 'invalid' | 'packages' | 'limit' | 'duplicate';
+  'size' | 'format' | 'version' | 'invalid' | 'packages' | 'limit' | 'duplicate' | 'selection';
 export class SpdxError extends Error {
   constructor(public code: ImportErrorCode) {
     super(code);
@@ -236,6 +236,12 @@ function readTagValue(text: string): RecordValue {
   return raw;
 }
 
+export const MAX_PINNED_PACKAGES = 12;
+export interface ImportOptions {
+  // Undefined uses automatic representatives; an empty array intentionally shows no names.
+  representatives?: readonly string[];
+  sections?: { relationships?: boolean; licenses?: boolean; ecosystems?: boolean };
+}
 export interface ImportSummary {
   source: string;
   count: number;
@@ -318,12 +324,26 @@ export function toNibmark(
   doc: SpdxDocument,
   rootId: string | undefined,
   locale: Locale,
+  options: ImportOptions = {},
 ): ImportSummary {
   const ko = locale === 'ko';
   const root = rootId ? doc.packages.find((p) => p.id === rootId) : undefined;
   if (rootId && !root) return bad('invalid');
   const allIds = new Set(doc.packages.map((p) => p.id));
   const inventory = doc.packages.filter((p) => p.id !== rootId);
+  const selected =
+    options.representatives === undefined ? undefined : new Set(options.representatives);
+  if (
+    selected &&
+    (selected.size > MAX_PINNED_PACKAGES ||
+      [...selected].some((id) => !allIds.has(id) || id === rootId))
+  )
+    return bad('selection');
+  const sections = {
+    relationships: options.sections?.relationships !== false,
+    licenses: options.sections?.licenses !== false,
+    ecosystems: options.sections?.ecosystems !== false,
+  };
   const edges = new Map<string, Set<string>>();
   const typedEdges: { from: string; to: string; type: string }[] = [];
   let unresolved = 0;
@@ -435,27 +455,38 @@ export function toNibmark(
     `group ${quote(useEcosystems ? (ko ? '패키지 생태계' : 'Package ecosystems') : ko ? '구성 요소' : 'Composition')} of packages`,
   );
   if (!inventory.length) lines.push(`  item ${quote(ko ? '없음' : 'None listed')} 0`);
-  // At most 12 named rows overall and 3 per category leave room under MAX_ROWS.
+  // At most 12 named rows overall leave room under MAX_ROWS. Automatic mode uses up to 3 per category.
   for (const [title, members] of composition) {
     lines.push(`  item ${quote(title)} ${members.length}`);
-    const names = new Map<string, { count: number; direct: boolean }>();
+    const names = new Map<string, { count: number; direct: boolean; selected: boolean }>();
     for (const p of members) {
       const label = clean(p.name + (p.version ? ' @ ' + p.version : ''));
       const previous = names.get(label);
       names.set(label, {
         count: (previous?.count ?? 0) + 1,
         direct: !!previous?.direct || directIds.has(p.id),
+        selected: !!previous?.selected || !!selected?.has(p.id),
       });
     }
-    const representatives = [...names].sort(
-      (a, b) => Number(b[1].direct) - Number(a[1].direct) || compare(a[0], b[0]),
-    );
-    for (const [label, value] of representatives.slice(0, Math.min(3, 12 - representativeCount))) {
+    const representatives = [...names]
+      .filter(([, value]) => selected === undefined || value.selected)
+      .sort((a, b) => Number(b[1].direct) - Number(a[1].direct) || compare(a[0], b[0]));
+    for (const [label, value] of representatives.slice(
+      0,
+      Math.min(
+        selected === undefined ? 3 : MAX_PINNED_PACKAGES,
+        MAX_PINNED_PACKAGES - representativeCount,
+      ),
+    )) {
       lines.push(`    includes ${quote(label)} ${value.count}`);
       representativeCount++;
     }
   }
-  lines.push('', `group ${quote(ko ? '기록된 의존 관계' : 'Recorded relationships')} of packages`);
+  if (sections.relationships)
+    lines.push(
+      '',
+      `group ${quote(ko ? '기록된 의존 관계' : 'Recorded relationships')} of packages`,
+    );
   const typedMembers = new Map<string, Set<string>>();
   for (const edge of typedEdges) {
     // Classify only edges participating in this root's reachable graph.
@@ -473,7 +504,7 @@ export function toNibmark(
     ],
     [ko ? '미분류' : 'Unclassified', inventory.filter((p) => !reached.has(p.id))],
   ] as const;
-  for (const [label, members] of partitions) {
+  for (const [label, members] of sections.relationships ? partitions : []) {
     lines.push(`  item ${quote(label)} ${members.length}`);
     for (const [type, names] of scopeNames) {
       const count = members.filter((p) => typedMembers.get(type)?.has(p.id)).length;
@@ -496,18 +527,19 @@ export function toNibmark(
       );
     }
   }
-  group(
-    ko ? '선언된 라이선스' : 'Declared licenses',
-    inventory.map((p) => {
-      if (p.license === undefined) return ko ? '선언 누락' : 'Not declared';
-      if (Array.from(p.license).length > 200 || /[\u0000-\u001f\u007f]/.test(p.license)) {
-        shortened = true;
-        return ko ? '긴 라이선스 선언 (원본 참조)' : 'Long license declarations (see SBOM)';
-      }
-      return p.license;
-    }),
-  );
-  if (!useEcosystems)
+  if (sections.licenses)
+    group(
+      ko ? '선언된 라이선스' : 'Declared licenses',
+      inventory.map((p) => {
+        if (p.license === undefined) return ko ? '선언 누락' : 'Not declared';
+        if (Array.from(p.license).length > 200 || /[\u0000-\u001f\u007f]/.test(p.license)) {
+          shortened = true;
+          return ko ? '긴 라이선스 선언 (원본 참조)' : 'Long license declarations (see SBOM)';
+        }
+        return p.license;
+      }),
+    );
+  if (!useEcosystems && sections.ecosystems)
     group(
       ko ? '패키지 생태계' : 'Package ecosystems',
       inventory.map((p) => ecosystem(p, ko)),
@@ -525,6 +557,8 @@ export function toNibmark(
           : 'Purposes follow SBOM records.',
         'Selected names only. Edges may be incomplete or overlap; runtime scope is not inferred.',
       ];
+  if (!sections.relationships || !sections.licenses || (!useEcosystems && !sections.ecosystems))
+    notes.push(ko ? '일부 영역은 숨겼습니다.' : 'Some sections hidden.');
   if (doc.warnings.length)
     notes.push(
       ko

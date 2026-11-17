@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { ImportPresentation } from './ImportPresentation';
 import type { Locale } from '../core';
 import {
   MAX_SPDX_BYTES,
@@ -7,10 +8,12 @@ import {
   toNibmark,
   type SpdxDocument,
   type ImportErrorCode,
+  type ImportOptions,
 } from '../importers/spdx';
 
 const errors: Record<Locale, Record<ImportErrorCode, string>> = {
   en: {
+    selection: 'Choose up to 12 packages, excluding the project root.',
     size: 'Choose an SPDX file no larger than 5 MB.',
     format:
       'Use SPDX 2.2/2.3 JSON or Tag/Value. Native Syft JSON, CycloneDX, XML and YAML are not supported yet.',
@@ -25,6 +28,7 @@ const errors: Record<Locale, Record<ImportErrorCode, string>> = {
       'Duplicate document/package SPDX IDs or repeated fields make the inventory ambiguous. Export a fresh file.',
   },
   ko: {
+    selection: '기준 프로젝트를 제외하고 최대 12개 패키지를 선택하세요.',
     size: '5 MB 이하의 SPDX 파일을 선택하세요.',
     format:
       'SPDX 2.2/2.3 JSON 또는 Tag/Value 파일을 사용하세요. Syft 자체 JSON, CycloneDX, XML, YAML은 아직 지원하지 않습니다.',
@@ -51,14 +55,16 @@ export function SpdxImport({
   const [root, setRoot] = useState('');
   const [error, setError] = useState<ImportErrorCode>();
   const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState<ImportOptions>({});
+  const [removedPin, setRemovedPin] = useState(false);
   const result = useMemo(() => {
     if (!doc) return undefined;
     try {
-      return { summary: toNibmark(doc, root || undefined, locale) };
+      return { summary: toNibmark(doc, root || undefined, locale, options) };
     } catch (e) {
       return { error: e instanceof SpdxError ? e.code : ('invalid' as ImportErrorCode) };
     }
-  }, [doc, root, locale]);
+  }, [doc, root, locale, options]);
   async function open(file: File | undefined) {
     if (!file) return;
     const token = ++request.current;
@@ -70,6 +76,8 @@ export function SpdxImport({
       const parsed = readSpdx(await file.text());
       if (token !== request.current) return;
       setDoc(parsed);
+      setOptions({});
+      setRemovedPin(false);
       setRoot(parsed.roots.length === 1 ? parsed.roots[0] : '');
     } catch (e) {
       if (token === request.current) setError(e instanceof SpdxError ? e.code : 'invalid');
@@ -152,7 +160,18 @@ export function SpdxImport({
             <>
               <label className="spdx-field">
                 {ko ? '기준 프로젝트 (집계에서 제외)' : 'Project root (excluded from counts)'}
-                <select value={root} onChange={(e) => setRoot(e.target.value)}>
+                <select
+                  value={root}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setRemovedPin(!!options.representatives?.includes(value));
+                    setOptions((current) => ({
+                      ...current,
+                      representatives: current.representatives?.filter((id) => id !== value),
+                    }));
+                    setRoot(value);
+                  }}
+                >
                   <option value="">
                     {ko
                       ? '지정하지 않음 · 모든 패키지 집계'
@@ -175,6 +194,21 @@ export function SpdxImport({
           )}
           {summary && (
             <>
+              {removedPin && (
+                <p role="status">
+                  {ko
+                    ? '기준 프로젝트로 지정한 패키지는 고정 목록에서 제외했습니다.'
+                    : 'The new project root was removed from pinned ingredients.'}
+                </p>
+              )}
+              <ImportPresentation
+                doc={doc!}
+                rootId={root}
+                locale={locale}
+                options={options}
+                ecosystemComposition={summary.compositionBasis === 'ecosystem'}
+                onChange={setOptions}
+              />
               <dl className="spdx-summary">
                 <div>
                   <dt>{ko ? '집계 패키지' : 'Counted packages'}</dt>

@@ -6,7 +6,7 @@ Nibmark turns a small text definition into a familiar, black-and-white **Softwar
 
 [Open the playground](https://jhbrunokim.github.io/nibmark/) · [Get started](#get-started) · [Syntax guide](docs/syntax.md) · [SPDX import](docs/spdx-import.md) · [Contributing](CONTRIBUTING.md)
 
-**v0.5.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
+**v0.6.0** — Try the [browser playground](https://jhbrunokim.github.io/nibmark/), or run it locally. There is no published npm package yet.
 
 <img src="docs/assets/pantry-api.svg" alt="Software Facts for Pantry API: 24 packages, with Fastify nested under Frameworks and PostgreSQL/Redis clients under Libraries. Fictional SPDX data." width="360">
 
@@ -24,7 +24,7 @@ npm ci
 npm run dev
 ```
 
-Open the Local URL printed by Vite. You will see an editable example and its rendered label.
+Open the Local URL printed by Vite. Use the **Example** picker to compare seven editable recipes and their rendered labels.
 
 1. Change the project name and ingredient counts.
 2. Download SVG or PNG.
@@ -89,11 +89,29 @@ Counts can be entered manually or imported from an SBOM. Each group must add up 
 An `includes` item is already counted in its parent. `% of Total` describes composition,
 not a recommended dependency allowance.
 
+## Try different recipes
+
+| Example                         | What it demonstrates                                               |
+| ------------------------------- | ------------------------------------------------------------------ |
+| Basic · dependencies            | Direct/transitive counts and nested optional dependencies          |
+| Korean                          | Korean typography and localized label furniture                    |
+| Static site · zero dependencies | A meaningful zero-total label                                      |
+| API · Node.js                   | A full hierarchical SBOM-style label with provenance               |
+| Web · React                     | UI libraries and build tooling                                     |
+| Data · Python                   | Data processing, numerical computing and ecosystem summaries       |
+| Container · Linux               | OS/application inventory without implying dependency relationships |
+
+All seven examples use illustrative data, not verified inventories of named releases.
+Switching examples supports **Undo replacement**, so you can compare recipes before
+adapting one to your project.
+
 ## The playground
 
 ![Nibmark 0.4.0 editor showing the Pantry API recipe and hierarchical Software Facts](docs/assets/pantry-playground.png)
 
 - Import SPDX 2.2/2.3 JSON or Tag/Value with a review of project root and counts.
+- Choose from seven recipes: basic, Korean, zero-dependency static site, Node.js API, React web app, Python data tool and Linux container.
+- Pin up to 12 representative package records and choose relationship/license/ecosystem sections while preserving inventory totals.
 - Live text editing with line numbers and precise syntax errors.
 - A fixed nutrition-label layout: bold headline, thick rules, nested ingredients.
 - English and Korean interface and label wording.
@@ -119,7 +137,8 @@ If you put the image in another directory, update the Markdown path.
 ## Start from an SBOM
 
 Choose **Import SPDX**, open an SPDX 2.2/2.3 JSON or Tag/Value file, review the project
-root and counts, and select **Create label**. Package totals, recorded relationships,
+root and counts, optionally open **Choose ingredients and sections** to pin names
+and choose sections, then select **Create label**. Package totals, recorded relationships,
 declared licenses, ecosystems and provenance become editable text. No file is uploaded.
 See the [generator compatibility and counting rules](docs/spdx-import.md) and the
 [pinned upstream regression corpus](tests/fixtures/spdx/upstream/README.md).
@@ -195,7 +214,7 @@ and hierarchical ingredients (0.4.0).
 Required rounds, one at a time:
 
 1. Real SBOM compatibility and missing-data presentation — completed in 0.5.0.
-2. Select and pin representative ingredients and choose displayed sections.
+2. Select and pin representative ingredients and choose displayed sections — completed in 0.6.0.
 3. Compact and detailed compositions within the same nutrition-label design.
 
 Optional backlog (not scheduled as required rounds):

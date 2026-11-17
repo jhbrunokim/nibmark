@@ -210,6 +210,36 @@ were also imported through the browser: both produced four package records when
 no project root was excluded. These external sample checks were run separately
 from the committed fictional regression fixtures.
 
+## Choose and pin ingredients (0.6.0)
+
+After importing a file, open **Choose ingredients and sections**. The default
+Automatic mode retains the existing selection rules. **Choose and pin** starts
+with no named ingredients; search by name, version or SPDX ID and pin up to twelve
+package records. Pins can span any categories, including more than three names
+within one category. Unpin an entry from the selected list even when it is outside
+the current search results. Search displays at most fifty matches at a time.
+
+Pinning chooses which names appear in nested rows; it does not filter the inventory
+or change any parent count or percentage. If several records have the same displayed
+name/version within a category, pinning one displays their combined inventory count.
+The full IDs shown in the picker distinguish records with otherwise identical names.
+A root change removes a pin only if that package becomes the excluded root. A new
+SBOM file resets all presentation choices; switching back to Automatic removes the
+manual selection. Closing/reopening the dialog retains choices for the current file.
+
+Composition totals always remain visible. Relationship, declared-license and
+additional ecosystem sections can be hidden independently. When ecosystems provide
+the fallback main composition, that composition cannot be hidden. Omitted sections
+are disclosed in the exported note; hiding a section does not assert its values are
+zero or change the denominator.
+
+**Create label** freezes the result into ordinary Nibmark groups and includes rows.
+Source saving, image exports and edit links preserve that result; they do not need
+the original SBOM. They do not embed the SBOM or preserve an import settings object
+for future SBOM versions. Re-import a new SBOM to choose representatives for that
+new inventory. The editor remains editable and **Undo replacement** restores the
+recipe that preceded the import.
+
 ## Upstream compatibility checks (0.5.0)
 
 Eight unchanged SPDX example/interoperability-test files from the official Syft,
