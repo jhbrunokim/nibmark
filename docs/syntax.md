@@ -104,3 +104,18 @@ sections. These choices become ordinary groups and includes rows, so no new DSL
 keyword is required. The main composition still sums to the full inventory count.
 Saving/sharing the recipe preserves the rendered selection, not the original SBOM
 or a reusable selection configuration. See [import presentation](spdx-import.md#choose-and-pin-ingredients-060).
+
+## Compact and detailed views (0.7.0)
+
+Write `view compact` or `view detailed` after `project` and before the count. Omission means detailed,
+so existing recipes render as before. The editor's Label view picker edits this declaration.
+
+Compact shows the first group, all its items and the first `includes` row per item. Order your
+representatives to choose which one appears. Other groups and child rows remain in the recipe;
+switch back to detailed to restore them. Totals, percentages, description, scope, notes and all
+provenance remain unchanged. A visible footnote identifies the compact selection. Accessibility
+text describes the same visible selection. Compact is a summary, not a guaranteed fixed height.
+
+The declaration travels with source files and edit links and applies to SVG and PNG exports.
+Invalid recipes must be fixed before using the view picker. EN / 한국어 controls label furniture;
+it does not translate user-authored ingredient names or recipe values.

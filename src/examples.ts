@@ -34,6 +34,28 @@ group "라이선스 구성" of dependencies
 
 note "정성을 담았습니다. 커피도 조금."
 `,
+  rust: `nutrition v1
+project "Trail CLI" version "0.9.0"
+description "Rust command-line tool for local log analysis"
+scope "Cargo packages · fictional example"
+packages 12
+
+group "Composition" of packages
+  item "Command-line interface" 3
+    includes "clap" 1
+    includes "anstream" 1
+  item "Data processing" 5
+    includes "serde" 1
+    includes "regex" 1
+  item "Platform helpers" 4
+    includes "libc" 1
+
+group "Declared licenses" of packages
+  item "MIT OR Apache-2.0" 10
+  item "MIT" 2
+
+note "Fictional inventory. Dual-license expressions are preserved."
+`,
   zero: `nutrition v1
 project "just-html" version "1.0.0"
 dependencies 0
@@ -161,3 +183,8 @@ note "Fictional container inventory. Being included in an image does not establi
 `,
 };
 export type ExampleName = keyof typeof examples;
+
+// Keep the Korean recipe as a regression fixture; language is chosen separately in the UI.
+export const exampleNames = (Object.keys(examples) as ExampleName[]).filter(
+  (name) => name !== 'korean',
+);

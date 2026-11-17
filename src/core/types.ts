@@ -13,6 +13,7 @@ export interface Group {
 export interface LabelModel {
   kind: 'nutrition';
   version: 1;
+  view?: 'compact' | 'detailed';
   project: string;
   projectVersion?: string;
   serving?: string;

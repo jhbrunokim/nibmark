@@ -16,6 +16,18 @@ const escape = (s: string) =>
 
 export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): RenderedLabel {
   const ko = locale === 'ko';
+  const compact = model.view === 'compact';
+  const groups = compact
+    ? model.groups.slice(0, 1).map((group) => ({
+        ...group,
+        items: group.items.map((item) => ({ ...item, includes: item.includes.slice(0, 1) })),
+      }))
+    : model.groups;
+  const viewNote = compact
+    ? ko
+      ? '간략형: 첫 구성 그룹과 항목별 대표 성분 최대 1개만 표시합니다.'
+      : 'Compact view: first composition group, up to one included ingredient per item.'
+    : '';
   const packages = model.measure === 'packages';
   const defaultScope = packages
     ? ko
@@ -99,7 +111,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
   draw(col, right - t.width(col, 13, 'bold'), y, 13, 'bold');
   y += 8;
   rule(0.8);
-  for (const [groupIndex, group] of model.groups.entries()) {
+  for (const [groupIndex, group] of groups.entries()) {
     if (groupIndex > 0) {
       y += 3;
       rule(11);
@@ -150,6 +162,10 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     ? `* 비율은 위 범위의 전체 ${packages ? '패키지' : '의존성'} ${model.dependencies}개를 기준으로 합니다. 포함 항목은 상위 수치에 이미 들어 있습니다. 비율은 반올림했습니다.${model.dependencies === 0 ? ' 전체가 0이면 비율은 —로 표시합니다.' : ''}`
     : `* Percentages use the ${model.dependencies} ${packages ? 'packages' : 'dependencies'} in the scope above. Included items are already counted in their parent. Percentages are rounded.${model.dependencies === 0 ? ' A zero total has no percentage (—).' : ''}`;
   wrapped(footnote, 11.3, 'regular', left, width, 14.5);
+  if (viewNote) {
+    y += 8;
+    wrapped(viewNote, 11.3, 'regular', left, width, 14.5);
+  }
   if (model.note) {
     y += 8;
     wrapped(model.note, 12, 'regular', left, width, 15);
@@ -171,7 +187,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
     model.description ?? '',
     `${serving}. ${model.scope ?? defaultScope}.`,
     `${headline}: ${value}.`,
-    ...model.groups.flatMap((g) => [
+    ...groups.flatMap((g) => [
       g.label,
       ...g.items.flatMap((i) => [
         `${i.label}: ${i.count} (${percent(i.count, model.dependencies)}).`,
@@ -182,6 +198,7 @@ export function render(model: LabelModel, fonts: Fonts, locale: Locale = 'en'): 
       ]),
     ]),
     footnote,
+    ...(viewNote ? [viewNote] : []),
     model.note ?? '',
     ...provenance,
   ].join(' ');
